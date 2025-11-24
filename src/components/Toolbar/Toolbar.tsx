@@ -9,6 +9,8 @@ interface ToolbarProps {
   onClear: () => void;
   onExport: () => void;
   onImport: (file: File) => void;
+  currentLineLength?: number;
+  gridScale: number;
 }
 
 export function Toolbar({
@@ -19,6 +21,8 @@ export function Toolbar({
   onClear,
   onExport,
   onImport,
+  currentLineLength,
+  gridScale,
 }: ToolbarProps) {
   const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,6 +55,13 @@ export function Toolbar({
         </button>
       </div>
 
+      <div className="toolbar-section">
+        <h3>Grid Scale</h3>
+        <div className="scale-display">
+          {gridScale}" per square
+        </div>
+      </div>
+
       {selectedTool === 'line' && (
         <div className="toolbar-section">
           <h3>Line Type</h3>
@@ -72,12 +83,17 @@ export function Toolbar({
           >
             Window
           </button>
+          {currentLineLength !== undefined && (
+            <div className="line-length-display">
+              Length: {currentLineLength.toFixed(1)}"
+            </div>
+          )}
         </div>
       )}
 
       <div className="toolbar-section">
         <h3>Actions</h3>
-        <button onClick={onClear}>Clear All</button>
+        <button onClick={onClear}>Reset</button>
         <button onClick={onExport}>Export</button>
         <label className="file-upload-button">
           Import

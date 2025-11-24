@@ -6,21 +6,21 @@ A visual room layout application built with React, TypeScript, and Vite. Design 
 
 ### Current (v1.0)
 - **Grid-based Canvas**: Graph paper style layout with configurable grid size
-- **Line Drawing**: Draw walls, doors, and windows along grid lines
+- **Measurement System**: Set scale (inches per grid square) for real-world accuracy
+- **Line Drawing**: Draw walls, doors, and windows along grid lines with live length display
 - **Line Editing**: Select lines, drag endpoints to resize/move, and delete lines
-- **Furniture Management**: Create custom furniture templates and place them in your room
+- **Furniture Management**: Create custom furniture templates with dimensions in inches
 - **Furniture Editing**: Move and rotate furniture with drag-and-drop
 - **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
-- **Data Persistence**: Automatically saves layouts and furniture to local storage
-- **Import/Export**: Save and load complete layouts as JSON files
-- **Testing**: Comprehensive test suite with 53+ unit tests
+- **Data Persistence**: Automatically saves layouts, furniture, and scale to local storage
+- **Import/Export**: Save and load complete layouts including measurements as JSON files
+- **Testing**: Comprehensive test suite with 69+ unit tests
 
 ### Planned Features
 - Diagonal and curved line drawing
-- Furniture collision prevention
+- Furniture collision prevention (detection helpers implemented)
 - Non-rectangular furniture shapes
 - Undo/redo functionality
-- Measurements and dimensions
 - Export to image/PDF
 - Multi-select and bulk operations
 
@@ -48,11 +48,19 @@ npm run preview
 
 ## Usage
 
+### Setting Grid Scale
+- On first launch, you'll be prompted to set the grid scale
+- Enter how many inches each grid square represents (e.g., 6", 12", 24")
+- Common values: 6" (half-foot), 12" (1 foot), 24" (2 feet)
+- The scale is displayed in the toolbar and used for all measurements
+- Use **Reset** to clear the layout and set a new scale
+
 ### Drawing Lines
 1. Select **Draw Line** tool from the toolbar
 2. Choose line type: **Wall**, **Door**, or **Window**
 3. Click and drag on the canvas to draw lines that snap to the grid
 4. Lines are constrained to horizontal or vertical directions
+5. **Live measurement**: The current line length in inches appears in the toolbar
 
 ### Editing Lines
 1. Select **Select** tool from the toolbar
@@ -65,20 +73,20 @@ npm run preview
 1. Click **Furniture** tool to open the furniture library
 2. Click **+ Add Furniture** to create a new template:
    - Enter name (e.g., "Sofa", "Table", "Bed")
-   - Set dimensions in grid squares (width × height)
+   - Set dimensions in inches (width × height)
    - Choose a color
    - Optionally add a category
 3. Click on a template to select it for placement
-4. Click on the grid to place furniture
+4. Click on the grid to place furniture (automatically scales to grid)
 5. Use **Select** tool to move furniture by dragging
 6. With furniture selected, use **Rotate 90°** to rotate
 7. Click **Delete** to remove furniture from the room
 
 ### Saving and Loading
 - Layouts are automatically saved to browser local storage
-- Use **Export** to save as a JSON file
-- Use **Import** to load a previously saved file
-- Use **Clear All** to start fresh
+- Use **Export** to save as a JSON file (includes scale settings)
+- Use **Import** to load a previously saved file (restores scale)
+- Use **Reset** to clear everything and set a new grid scale
 
 ## Project Structure
 
@@ -86,17 +94,18 @@ npm run preview
 src/
 ├── components/
 │   ├── Grid/              # Main canvas component
-│   ├── Toolbar/           # Tool selection UI
-│   └── FurnitureLibrary/  # Furniture template manager
-├── types/                 # TypeScript type definitions
+│   ├── Toolbar/           # Tool selection
+│   ├── FurnitureLibrary/  # Furniture management
+│   └── ScaleModal/        # Grid scale configuration
+├── types/                 # TypeScript definitions
 │   ├── grid.ts
 │   ├── line.ts
 │   └── furniture.ts
 ├── utils/                 # Helper functions
-│   ├── gridHelpers.ts
+│   ├── gridHelpers.ts     # Grid calculations & scale conversions
 │   ├── lineHelpers.ts
 │   ├── collisionDetection.ts
-│   └── storage.ts
+│   └── storage.ts         # Local storage & import/export
 └── App.tsx                # Main application
 ```
 

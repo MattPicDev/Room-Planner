@@ -43,3 +43,26 @@ export function isGridAligned(start: Point, end: Point): boolean {
 export function distance(p1: Point, p2: Point): number {
   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 }
+
+/**
+ * Convert grid cells to inches based on scale
+ */
+export function cellsToInches(cells: number, inchesPerCell: number): number {
+  return cells * inchesPerCell;
+}
+
+/**
+ * Convert inches to grid cells based on scale
+ */
+export function inchesToCells(inches: number, inchesPerCell: number): number {
+  return inches / inchesPerCell;
+}
+
+/**
+ * Calculate line length in inches
+ */
+export function calculateLineLength(start: Point, end: Point, cellSize: number, inchesPerCell: number): number {
+  const pixelDistance = distance(start, end);
+  const cells = pixelDistance / cellSize;
+  return cellsToInches(cells, inchesPerCell);
+}

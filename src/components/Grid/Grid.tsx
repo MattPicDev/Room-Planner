@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import type { GridConfig } from '../../types/grid';
 import type { Line } from '../../types/line';
 import type { FurnitureInstance, FurnitureTemplate } from '../../types/furniture';
-import { snapToGrid, canvasToGrid } from '../../utils/gridHelpers';
+import { snapToGrid, canvasToGrid, calculateLineLength } from '../../utils/gridHelpers';
 import { findLineAtPoint, findEndpointAtPoint } from '../../utils/lineHelpers';
 import { isPointInFurniture } from '../../utils/collisionDetection';
 import './Grid.css';
@@ -22,6 +22,7 @@ interface GridProps {
   onFurnitureSelect?: (furniture: FurnitureInstance | null) => void;
   onFurnitureMove?: (id: string, position: { x: number; y: number }) => void;
   selectedFurniture?: FurnitureInstance | null;
+  onCurrentLineLengthChange?: (length: number | undefined) => void;
 }
 
 export function Grid({ 
@@ -39,6 +40,7 @@ export function Grid({
   onFurnitureSelect,
   onFurnitureMove,
   selectedFurniture,
+  onCurrentLineLengthChange,
 }: GridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -47,6 +49,16 @@ export function Grid({
   const [isDraggingEndpoint, setIsDraggingEndpoint] = useState<'start' | 'end' | null>(null);
   const [isDraggingFurniture, setIsDraggingFurniture] = useState(false);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+
+  // Calculate current line length and notify parent
+  useEffect(() => {
+    if ((isDrawing || isDraggingEndpoint) && startPoint && currentPoint && onCurrentLineLengthChange) {
+      const length = calculateLineLength(startPoint, currentPoint, config.cellSize, config.inchesPerCell);
+      onCurrentLineLengthChange(length);
+    } else if (onCurrentLineLengthChange) {
+      onCurrentLineLengthChange(undefined);
+    }
+  }, [isDrawing, isDraggingEndpoint, startPoint, currentPoint, config.cellSize, config.inchesPerCell, onCurrentLineLengthChange]);
 
   // Draw the grid
   const drawGrid = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -110,12 +122,16 @@ export function Grid({
       if (!template) return;
 
       const isSelected = selectedFurniture?.id === item.id;
-      const { cellSize } = config;
+      const { cellSize, inchesPerCell } = config;
+      
+      // Convert dimensions from inches to cells
+      const widthInCells = template.width / inchesPerCell;
+      const heightInCells = template.height / inchesPerCell;
       
       // Calculate dimensions based on rotation
       const isRotated = item.rotation === 90 || item.rotation === 270;
-      const width = isRotated ? template.height : template.width;
-      const height = isRotated ? template.width : template.height;
+      const width = isRotated ? heightInCells : widthInCells;
+      const height = isRotated ? widthInCells : heightInCells;
       
       const x = item.position.x * cellSize;
       const y = item.position.y * cellSize;
@@ -141,12 +157,16 @@ export function Grid({
     
     // Draw preview furniture while placing
     if (mode === 'furniture' && selectedTemplate && currentPoint) {
-      const { cellSize } = config;
+      const { cellSize, inchesPerCell } = config;
       const gridPos = canvasToGrid(currentPoint, cellSize);
       const x = gridPos.x * cellSize;
       const y = gridPos.y * cellSize;
-      const w = selectedTemplate.width * cellSize;
-      const h = selectedTemplate.height * cellSize;
+      
+      // Convert dimensions from inches to cells
+      const widthInCells = selectedTemplate.width / inchesPerCell;
+      const heightInCells = selectedTemplate.height / inchesPerCell;
+      const w = widthInCells * cellSize;
+      const h = heightInCells * cellSize;
       
       ctx.fillStyle = selectedTemplate.color;
       ctx.globalAlpha = 0.5;
@@ -204,7 +224,7 @@ export function Grid({
       // Check if clicking on existing furniture to select/drag
       const clickedFurniture = furniture.find(item => {
         const template = furnitureTemplates.find(t => t.id === item.templateId);
-        return template && isPointInFurniture(gridPos, item, template);
+        return template && isPointInFurniture(gridPos, item, template, config.inchesPerCell);
       });
       
       if (clickedFurniture) {
@@ -226,10 +246,10 @@ export function Grid({
         onFurnitureSelect?.(newFurniture);
       }
     } else if (mode === 'select') {
-      // Check if clicking on furniture first
+      // Check if clicking on furniture to select it
       const clickedFurniture = furniture.find(item => {
         const template = furnitureTemplates.find(t => t.id === item.templateId);
-        return template && isPointInFurniture(gridPos, item, template);
+        return template && isPointInFurniture(gridPos, item, template, config.inchesPerCell);
       });
       
       if (clickedFurniture) {
@@ -303,7 +323,7 @@ export function Grid({
       // Check furniture hover
       const hoveredFurniture = furniture.find(item => {
         const template = furnitureTemplates.find(t => t.id === item.templateId);
-        return template && isPointInFurniture(gridPos, item, template);
+        return template && isPointInFurniture(gridPos, item, template, config.inchesPerCell);
       });
       
       if (hoveredFurniture) {

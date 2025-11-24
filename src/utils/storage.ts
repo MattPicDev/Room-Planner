@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   FURNITURE_TEMPLATES: 'roomPlanner_furnitureTemplates',
   LAYOUT_LINES: 'roomPlanner_lines',
   LAYOUT_FURNITURE: 'roomPlanner_furniture',
+  GRID_SCALE: 'roomPlanner_gridScale',
 } as const;
 
 /**
@@ -56,6 +57,30 @@ export function loadLines(): Line[] {
 }
 
 /**
+ * Save grid scale to local storage
+ */
+export function saveGridScale(inchesPerCell: number): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.GRID_SCALE, JSON.stringify(inchesPerCell));
+  } catch (error) {
+    console.error('Failed to save grid scale:', error);
+  }
+}
+
+/**
+ * Load grid scale from local storage
+ */
+export function loadGridScale(): number | null {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.GRID_SCALE);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error('Failed to load grid scale:', error);
+    return null;
+  }
+}
+
+/**
  * Export entire layout as JSON
  */
 export function exportLayout(): string {
@@ -63,6 +88,7 @@ export function exportLayout(): string {
     lines: loadLines(),
     furniture: localStorage.getItem(STORAGE_KEYS.LAYOUT_FURNITURE) || '[]',
     templates: loadFurnitureTemplates(),
+    gridScale: loadGridScale(),
     version: '1.0',
     exportedAt: new Date().toISOString(),
   }, null, 2);
@@ -79,6 +105,9 @@ export function importLayout(jsonString: string): boolean {
     }
     if (data.templates) {
       saveFurnitureTemplates(data.templates);
+    }
+    if (data.gridScale !== undefined) {
+      saveGridScale(data.gridScale);
     }
     return true;
   } catch (error) {

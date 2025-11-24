@@ -20,8 +20,8 @@ export function FurnitureLibrary({
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newTemplate, setNewTemplate] = useState({
     name: '',
-    width: 2,
-    height: 2,
+    width: 24,
+    height: 18,
     color: '#3498db',
     category: '',
   });
@@ -32,8 +32,8 @@ export function FurnitureLibrary({
       onAddTemplate(newTemplate);
       setNewTemplate({
         name: '',
-        width: 2,
-        height: 2,
+        width: 24,
+        height: 18,
         color: '#3498db',
         category: '',
       });
@@ -64,24 +64,26 @@ export function FurnitureLibrary({
           />
           <div className="dimension-inputs">
             <label>
-              Width:
+              Width (inches):
               <input
                 type="number"
                 min="1"
-                max="20"
+                max="240"
+                step="0.5"
                 value={newTemplate.width}
-                onChange={(e) => setNewTemplate({ ...newTemplate, width: parseInt(e.target.value) })}
+                onChange={(e) => setNewTemplate({ ...newTemplate, width: parseFloat(e.target.value) })}
                 required
               />
             </label>
             <label>
-              Height:
+              Height (inches):
               <input
                 type="number"
                 min="1"
-                max="20"
+                max="240"
+                step="0.5"
                 value={newTemplate.height}
-                onChange={(e) => setNewTemplate({ ...newTemplate, height: parseInt(e.target.value) })}
+                onChange={(e) => setNewTemplate({ ...newTemplate, height: parseFloat(e.target.value) })}
                 required
               />
             </label>
@@ -125,7 +127,7 @@ export function FurnitureLibrary({
               <div className="template-info">
                 <div className="template-name">{template.name}</div>
                 <div className="template-dimensions">
-                  {template.width}×{template.height} squares
+                  {template.width}"×{template.height}"
                 </div>
                 {template.category && (
                   <div className="template-category">{template.category}</div>

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import type { FurnitureTemplate } from '../types/furniture';
 import type { Line } from '../types/line';
 import { 
@@ -6,6 +6,8 @@ import {
   loadFurnitureTemplates, 
   saveLines, 
   loadLines,
+  saveGridScale,
+  loadGridScale,
   exportLayout,
   importLayout
 } from './storage';
@@ -171,6 +173,51 @@ describe('storage', () => {
 
       const loadedLines = loadLines();
       expect(loadedLines).toEqual([]);
+    });
+  });
+
+  describe('gridScale', () => {
+    it('should save and load grid scale', () => {
+      saveGridScale(12);
+      const loaded = loadGridScale();
+      expect(loaded).toBe(12);
+    });
+
+    it('should handle different scale values', () => {
+      saveGridScale(6);
+      expect(loadGridScale()).toBe(6);
+      
+      saveGridScale(24);
+      expect(loadGridScale()).toBe(24);
+    });
+
+    it('should return null when no scale is saved', () => {
+      const loaded = loadGridScale();
+      expect(loaded).toBe(null);
+    });
+
+    it('should include grid scale in export', () => {
+      saveGridScale(18);
+      const exported = exportLayout();
+      const data = JSON.parse(exported);
+      
+      expect(data.gridScale).toBe(18);
+      expect(data.version).toBe('1.0');
+    });
+
+    it('should import grid scale from layout', () => {
+      const layoutData = {
+        lines: [],
+        templates: [],
+        gridScale: 15,
+        version: '1.0',
+      };
+
+      const result = importLayout(JSON.stringify(layoutData));
+      expect(result).toBe(true);
+
+      const loadedScale = loadGridScale();
+      expect(loadedScale).toBe(15);
     });
   });
 });

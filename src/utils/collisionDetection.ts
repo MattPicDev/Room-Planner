@@ -2,19 +2,24 @@ import type { Point } from '../types/grid';
 import type { FurnitureInstance, FurnitureTemplate } from '../types/furniture';
 
 /**
- * Get the bounding box of a furniture instance
+ * Get the bounding box of a furniture instance in grid cells
  */
 export function getFurnitureBounds(
   furniture: FurnitureInstance,
-  template: FurnitureTemplate
+  template: FurnitureTemplate,
+  inchesPerCell: number = 12
 ): { x: number; y: number; width: number; height: number } {
   const { position, rotation } = furniture;
   const { width, height } = template;
 
+  // Convert dimensions from inches to cells
+  const widthInCells = width / inchesPerCell;
+  const heightInCells = height / inchesPerCell;
+
   // Handle rotation - swap dimensions for 90/270 degree rotations
   const isRotated = rotation === 90 || rotation === 270;
-  const actualWidth = isRotated ? height : width;
-  const actualHeight = isRotated ? width : height;
+  const actualWidth = isRotated ? heightInCells : widthInCells;
+  const actualHeight = isRotated ? widthInCells : heightInCells;
 
   return {
     x: position.x,
@@ -31,10 +36,11 @@ export function checkFurnitureCollision(
   f1: FurnitureInstance,
   t1: FurnitureTemplate,
   f2: FurnitureInstance,
-  t2: FurnitureTemplate
+  t2: FurnitureTemplate,
+  inchesPerCell: number = 12
 ): boolean {
-  const b1 = getFurnitureBounds(f1, t1);
-  const b2 = getFurnitureBounds(f2, t2);
+  const b1 = getFurnitureBounds(f1, t1, inchesPerCell);
+  const b2 = getFurnitureBounds(f2, t2, inchesPerCell);
 
   return !(
     b1.x + b1.width <= b2.x ||
@@ -50,9 +56,10 @@ export function checkFurnitureCollision(
 export function isPointInFurniture(
   point: Point,
   furniture: FurnitureInstance,
-  template: FurnitureTemplate
+  template: FurnitureTemplate,
+  inchesPerCell: number = 12
 ): boolean {
-  const bounds = getFurnitureBounds(furniture, template);
+  const bounds = getFurnitureBounds(furniture, template, inchesPerCell);
   return (
     point.x >= bounds.x &&
     point.x < bounds.x + bounds.width &&

@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Grid } from './components/Grid/Grid';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { FurnitureLibrary } from './components/FurnitureLibrary/FurnitureLibrary';
+import { ScaleModal } from './components/ScaleModal/ScaleModal';
 import type { Line, LineType } from './types/line';
 import type { FurnitureTemplate, FurnitureInstance } from './types/furniture';
 import { DEFAULT_GRID_CONFIG } from './types/grid';
+import type { GridConfig } from './types/grid';
 import { LINE_DEFAULTS } from './types/line';
-import { saveLines, loadLines, exportLayout, importLayout, saveFurnitureTemplates, loadFurnitureTemplates } from './utils/storage';
+import { saveLines, loadLines, exportLayout, importLayout, saveFurnitureTemplates, loadFurnitureTemplates, saveGridScale, loadGridScale } from './utils/storage';
 import './App.css';
 
 function App() {
@@ -18,13 +20,23 @@ function App() {
   const [furniture, setFurniture] = useState<FurnitureInstance[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<FurnitureTemplate | null>(null);
   const [selectedFurniture, setSelectedFurniture] = useState<FurnitureInstance | null>(null);
+  const [gridConfig, setGridConfig] = useState<GridConfig>(DEFAULT_GRID_CONFIG);
+  const [showScaleModal, setShowScaleModal] = useState(false);
+  const [currentLineLength, setCurrentLineLength] = useState<number | undefined>(undefined);
 
-  // Load saved data on mount
+  // Load saved data on mount and show scale modal if not set
   useEffect(() => {
     const savedLines = loadLines();
     setLines(savedLines);
     const savedTemplates = loadFurnitureTemplates();
     setFurnitureTemplates(savedTemplates);
+    
+    const savedScale = loadGridScale();
+    if (savedScale !== null) {
+      setGridConfig({ ...DEFAULT_GRID_CONFIG, inchesPerCell: savedScale });
+    } else {
+      setShowScaleModal(true);
+    }
   }, []);
 
   // Save lines whenever they change
@@ -61,9 +73,12 @@ function App() {
   };
 
   const handleClear = () => {
-    if (confirm('Are you sure you want to clear all lines?')) {
+    if (confirm('Reset will clear all lines and furniture, and allow you to set a new grid scale. Continue?')) {
       setLines([]);
+      setFurniture([]);
       setSelectedLine(null);
+      setSelectedFurniture(null);
+      setShowScaleModal(true);
     }
   };
 
@@ -133,6 +148,10 @@ function App() {
       if (importLayout(content)) {
         const importedLines = loadLines();
         setLines(importedLines);
+        const importedScale = loadGridScale();
+        if (importedScale !== null) {
+          setGridConfig({ ...DEFAULT_GRID_CONFIG, inchesPerCell: importedScale });
+        }
         alert('Layout imported successfully!');
       } else {
         alert('Failed to import layout. Please check the file format.');
@@ -141,8 +160,20 @@ function App() {
     reader.readAsText(file);
   };
 
+  const handleScaleConfirm = (inchesPerCell: number) => {
+    setGridConfig({ ...DEFAULT_GRID_CONFIG, inchesPerCell });
+    saveGridScale(inchesPerCell);
+    setShowScaleModal(false);
+  };
+
   return (
     <div className="app">
+      <ScaleModal
+        isOpen={showScaleModal}
+        currentScale={gridConfig.inchesPerCell}
+        onConfirm={handleScaleConfirm}
+      />
+      
       <header className="app-header">
         <h1>Room Planner</h1>
         <p>Design your room layout on a grid</p>
@@ -159,6 +190,8 @@ function App() {
         onClear={handleClear}
         onExport={handleExport}
         onImport={handleImport}
+        currentLineLength={currentLineLength}
+        gridScale={gridConfig.inchesPerCell}
       />
 
       <main className="app-main">
@@ -213,7 +246,7 @@ function App() {
             )}
             
             <Grid
-              config={DEFAULT_GRID_CONFIG}
+              config={gridConfig}
               lines={lines}
               furniture={furniture}
               furnitureTemplates={furnitureTemplates}
@@ -227,6 +260,7 @@ function App() {
               onFurnitureSelect={setSelectedFurniture}
               onFurnitureMove={handleFurnitureMove}
               selectedFurniture={selectedFurniture}
+              onCurrentLineLengthChange={setCurrentLineLength}
             />
           </div>
         </div>

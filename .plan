@@ -16,6 +16,8 @@ A visual room layout application that allows users to design room layouts on a g
 - [x] Project scaffolding
 - [x] Render grid canvas (graph paper style)
 - [x] Configurable grid size (default: 20px squares)
+- [x] Grid scale configuration (inches per square)
+- [x] Scale persistence in storage
 - [ ] Pan and zoom functionality
 - [x] Grid snapping for objects
 
@@ -25,6 +27,7 @@ A visual room layout application that allows users to design room layouts on a g
 - [x] Edit existing lines (move endpoints, delete)
 - [x] Line properties: thickness, color, type
 - [x] Select mode with visual feedback
+- [x] Real-time line length display in inches
 - [ ] Validation: prevent overlapping lines
 
 **Note**: Future version will support diagonal/free-form lines
@@ -32,10 +35,10 @@ A visual room layout application that allows users to design room layouts on a g
 ### 3. Furniture Management
 - [x] Define furniture templates (rectangular shapes)
   - Name
-  - Dimensions (width x height in grid squares)
+  - Dimensions (width x height in inches)
   - Color/style
 - [x] Furniture library/palette
-- [x] Place furniture on grid
+- [x] Place furniture on grid (automatically converted to grid scale)
 - [x] Move furniture (drag and drop)
 - [x] Rotate furniture (90° increments)
 - [x] Delete furniture from layout
@@ -44,15 +47,18 @@ A visual room layout application that allows users to design room layouts on a g
 ### 4. Data Persistence
 - [x] Local storage for furniture templates
 - [x] Local storage for current layout
-- [x] Export layout as JSON
-- [x] Import layout from JSON
+- [x] Local storage for grid scale
+- [x] Export layout as JSON (includes scale)
+- [x] Import layout from JSON (restores scale)
 
 **Note**: Future version will support per-user cloud storage
 
 ### 5. Testing
 - [x] Unit tests for utility functions
-- [x] Test coverage for grid helpers
+- [x] Test coverage for grid helpers (including scale conversions)
 - [x] Test coverage for line helpers
+- [x] Test coverage for collision detection (with scale support)
+- [x] Test coverage for storage (including grid scale)
 - [ ] Component tests for React components
 - [ ] Integration tests for user workflows
 
@@ -143,10 +149,9 @@ src/
 ### Success Criteria
 - ✅ User can create a basic room layout with walls
 - ✅ User can edit and delete lines
+- ✅ User can see line lengths in real-world measurements (inches)
+- ✅ User can define and place furniture with accurate dimensions
+- ✅ User can set and persist grid scale for measurement accuracy
 - ✅ Layout persists across browser sessions
-- ✅ All core features have test coverage >80%
+- ✅ All core features have test coverage >80% (69 tests passing)
 - ✅ Documentation is complete and accurate
-- ⏳ User can define and place furniture
-- Layout persists across browser sessions
-- All features have test coverage >80%
-- Documentation is complete and accurate
