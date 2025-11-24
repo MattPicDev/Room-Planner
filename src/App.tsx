@@ -25,6 +25,19 @@ function App() {
   const [currentLineLength, setCurrentLineLength] = useState<number | undefined>(undefined);
   const [zoomLevel, setZoomLevel] = useState(1);
 
+  // Sync selectedLine when lines array changes
+  useEffect(() => {
+    if (selectedLine) {
+      const updatedLine = lines.find(line => line.id === selectedLine.id);
+      if (updatedLine) {
+        setSelectedLine(updatedLine);
+      } else {
+        // Line was deleted
+        setSelectedLine(null);
+      }
+    }
+  }, [lines]);
+
   // Load saved data on mount and show scale modal if not set
   useEffect(() => {
     const savedLines = loadLines();

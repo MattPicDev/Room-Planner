@@ -372,7 +372,10 @@ export function Grid({
         const endpoint = findEndpointAtPoint(worldPoint, selectedLine, 15 / zoomLevel);
         if (endpoint) {
           setIsDraggingEndpoint(endpoint);
-          setStartPoint(endpoint === 'start' ? selectedLine.end : selectedLine.start);
+          // Store the opposite endpoint as the anchor point that won't move
+          // When dragging 'start', the 'end' stays fixed and vice versa
+          const anchorPoint = endpoint === 'start' ? selectedLine.end : selectedLine.start;
+          setStartPoint(anchorPoint);
           setCurrentPoint(snapped);
           return;
         }
@@ -505,13 +508,17 @@ export function Grid({
 
     // Handle endpoint dragging
     if (isDraggingEndpoint && selectedLine && currentPoint && startPoint && onLineEdit) {
-      // Only update if the line has length
+      // Only update if the line would have non-zero length
       if (currentPoint.x !== startPoint.x || currentPoint.y !== startPoint.y) {
+        // Create new point objects to ensure React detects the change
         const updates: Partial<Line> = isDraggingEndpoint === 'start'
-          ? { start: currentPoint, end: startPoint }
-          : { start: startPoint, end: currentPoint };
+          ? { start: { ...currentPoint }, end: { ...startPoint } }
+          : { start: { ...startPoint }, end: { ...currentPoint } };
         
         onLineEdit(selectedLine.id, updates);
+      } else {
+        // If both points are the same, delete the line
+        // For now, just don't update (user can delete manually)
       }
       setIsDraggingEndpoint(null);
       setStartPoint(null);
