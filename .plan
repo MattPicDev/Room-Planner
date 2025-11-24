@@ -1,0 +1,140 @@
+# Room Planner - Project Plan
+
+## Project Overview
+A visual room layout application that allows users to design room layouts on a grid-based canvas.
+
+## Technology Stack
+- **Frontend Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Rendering**: HTML5 Canvas
+- **State Management**: React hooks (useState, useReducer)
+- **Styling**: CSS modules
+
+## Phase 1: Core Features (Current)
+
+### 1. Grid System
+- [x] Project scaffolding
+- [ ] Render grid canvas (graph paper style)
+- [ ] Configurable grid size (default: 10px squares)
+- [ ] Pan and zoom functionality
+- [ ] Grid snapping for objects
+
+### 2. Line Drawing
+- [ ] Draw lines along grid lines (horizontal/vertical only)
+- [ ] Line drawing modes: wall, door, window
+- [ ] Edit existing lines (move endpoints, delete)
+- [ ] Line properties: thickness, color, type
+- [ ] Validation: prevent overlapping lines
+
+**Note**: Future version will support diagonal/free-form lines
+
+### 3. Furniture Management
+- [ ] Define furniture templates (rectangular shapes)
+  - Name
+  - Dimensions (width x height in grid squares)
+  - Color/style
+- [ ] Furniture library/palette
+- [ ] Place furniture on grid
+- [ ] Move furniture (drag and drop)
+- [ ] Rotate furniture (90° increments)
+- [ ] Delete furniture from layout
+- [ ] Furniture collision detection
+
+### 4. Data Persistence
+- [ ] Local storage for furniture templates
+- [ ] Local storage for current layout
+- [ ] Export layout as JSON
+- [ ] Import layout from JSON
+
+**Note**: Future version will support per-user cloud storage
+
+## Phase 2: Future Enhancements
+
+### Planned Features
+- Diagonal and curved line drawing
+- Non-rectangular furniture shapes
+- User authentication and cloud storage
+- Multiple room layouts per user
+- Measurement tools (distance, area)
+- Export to image/PDF
+- Furniture search and filtering
+- Undo/redo functionality
+- Keyboard shortcuts
+- Touch screen support
+
+## Development Workflow
+
+### Git Commits
+Each feature implementation must include:
+1. **Code**: Implementation of the feature
+2. **Tests**: Unit and integration tests
+3. **Documentation**: Updated README and inline comments
+
+### Testing Strategy
+- Unit tests for utility functions
+- Component tests for React components
+- Integration tests for user workflows
+- Manual testing checklist for UI interactions
+
+### Documentation Requirements
+- Inline code comments for complex logic
+- README with setup instructions
+- API documentation for key functions
+- User guide for application features
+
+## File Structure
+```
+src/
+├── components/
+│   ├── Grid/
+│   │   ├── Grid.tsx
+│   │   ├── Grid.test.tsx
+│   │   └── Grid.css
+│   ├── Furniture/
+│   │   ├── FurnitureLibrary.tsx
+│   │   ├── FurnitureItem.tsx
+│   │   └── Furniture.test.tsx
+│   ├── Line/
+│   │   ├── LineDrawer.tsx
+│   │   ├── Line.tsx
+│   │   └── Line.test.tsx
+│   └── Toolbar/
+│       ├── Toolbar.tsx
+│       └── Toolbar.test.tsx
+├── hooks/
+│   ├── useCanvas.ts
+│   ├── useGrid.ts
+│   └── useFurniture.ts
+├── types/
+│   ├── grid.ts
+│   ├── furniture.ts
+│   └── line.ts
+├── utils/
+│   ├── gridHelpers.ts
+│   ├── collisionDetection.ts
+│   └── storage.ts
+└── App.tsx
+```
+
+## Requirements Summary
+
+### Version 1.0 Requirements
+1. ✅ Grid-based canvas (graph paper style)
+2. ⏳ Line drawing along grid lines
+3. ⏳ Line editing (move, delete)
+4. ⏳ Rectangular furniture definition
+5. ⏳ Furniture placement and manipulation
+6. ⏳ Local data persistence
+
+### Constraints
+- Lines must follow grid lines (no diagonals yet)
+- Furniture must be rectangular
+- No user authentication (local storage only)
+- Desktop-first design
+
+### Success Criteria
+- User can create a basic room layout with walls
+- User can define and place furniture
+- Layout persists across browser sessions
+- All features have test coverage >80%
+- Documentation is complete and accurate

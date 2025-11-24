@@ -1,0 +1,98 @@
+import type { LineType } from '../../types/line';
+import './Toolbar.css';
+
+interface ToolbarProps {
+  selectedTool: 'line' | 'furniture' | 'select';
+  selectedLineType: LineType;
+  onToolChange: (tool: 'line' | 'furniture' | 'select') => void;
+  onLineTypeChange: (lineType: LineType) => void;
+  onClear: () => void;
+  onExport: () => void;
+  onImport: (file: File) => void;
+}
+
+export function Toolbar({
+  selectedTool,
+  selectedLineType,
+  onToolChange,
+  onLineTypeChange,
+  onClear,
+  onExport,
+  onImport,
+}: ToolbarProps) {
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onImport(file);
+    }
+  };
+
+  return (
+    <div className="toolbar">
+      <div className="toolbar-section">
+        <h3>Tools</h3>
+        <button
+          className={selectedTool === 'line' ? 'active' : ''}
+          onClick={() => onToolChange('line')}
+        >
+          Draw Line
+        </button>
+        <button
+          className={selectedTool === 'furniture' ? 'active' : ''}
+          onClick={() => onToolChange('furniture')}
+          disabled
+          title="Coming soon"
+        >
+          Furniture
+        </button>
+        <button
+          className={selectedTool === 'select' ? 'active' : ''}
+          onClick={() => onToolChange('select')}
+          disabled
+          title="Coming soon"
+        >
+          Select
+        </button>
+      </div>
+
+      {selectedTool === 'line' && (
+        <div className="toolbar-section">
+          <h3>Line Type</h3>
+          <button
+            className={selectedLineType === 'wall' ? 'active' : ''}
+            onClick={() => onLineTypeChange('wall')}
+          >
+            Wall
+          </button>
+          <button
+            className={selectedLineType === 'door' ? 'active' : ''}
+            onClick={() => onLineTypeChange('door')}
+          >
+            Door
+          </button>
+          <button
+            className={selectedLineType === 'window' ? 'active' : ''}
+            onClick={() => onLineTypeChange('window')}
+          >
+            Window
+          </button>
+        </div>
+      )}
+
+      <div className="toolbar-section">
+        <h3>Actions</h3>
+        <button onClick={onClear}>Clear All</button>
+        <button onClick={onExport}>Export</button>
+        <label className="file-upload-button">
+          Import
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleFileImport}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}

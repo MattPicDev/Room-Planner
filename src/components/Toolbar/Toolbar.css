@@ -1,0 +1,57 @@
+.toolbar {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  background-color: #2c3e50;
+  color: white;
+  border-bottom: 3px solid #34495e;
+}
+
+.toolbar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolbar-section h3 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ecf0f1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toolbar button,
+.file-upload-button {
+  padding: 8px 16px;
+  border: 1px solid #34495e;
+  background-color: #34495e;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.toolbar button:hover:not(:disabled),
+.file-upload-button:hover {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.toolbar button.active {
+  background-color: #3498db;
+  border-color: #2980b9;
+  font-weight: 600;
+}
+
+.toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.file-upload-button {
+  display: inline-block;
+  text-align: center;
+}
