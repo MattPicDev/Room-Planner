@@ -49,6 +49,8 @@ export function Grid({
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
   const [currentPoint, setCurrentPoint] = useState<{ x: number; y: number } | null>(null);
   const [isDraggingEndpoint, setIsDraggingEndpoint] = useState<'start' | 'end' | null>(null);
+  const [isDraggingLine, setIsDraggingLine] = useState(false);
+  const [lineDragOffset, setLineDragOffset] = useState<{ x: number; y: number } | null>(null);
   const [isDraggingFurniture, setIsDraggingFurniture] = useState(false);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
   
@@ -160,7 +162,7 @@ export function Grid({
     lines.forEach(line => {
       // Highlight selected line
       const isSelected = selectedLine?.id === line.id;
-      const isDraggingThisLine = isSelected && isDraggingEndpoint && startPoint && currentPoint;
+      const isDraggingThisLine = isSelected && (isDraggingEndpoint || isDraggingLine) && startPoint && currentPoint;
       
       ctx.strokeStyle = isSelected ? '#3498db' : line.color;
       ctx.lineWidth = (isSelected ? line.thickness + 2 : line.thickness) / zoomLevel;
@@ -168,9 +170,21 @@ export function Grid({
       // Draw the line with preview if being dragged
       ctx.beginPath();
       if (isDraggingThisLine) {
-        // Show preview of line being edited
-        const previewStart = isDraggingEndpoint === 'start' ? currentPoint : line.start;
-        const previewEnd = isDraggingEndpoint === 'end' ? currentPoint : line.end;
+        // Show preview of line being edited or moved
+        let previewStart, previewEnd;
+        if (isDraggingLine) {
+          // Translating entire line
+          previewStart = startPoint;
+          previewEnd = currentPoint;
+        } else if (isDraggingEndpoint === 'start') {
+          // Dragging start endpoint, end is fixed at startPoint
+          previewStart = currentPoint;
+          previewEnd = startPoint;
+        } else {
+          // Dragging end endpoint, start is fixed at startPoint
+          previewStart = startPoint;
+          previewEnd = currentPoint;
+        }
         ctx.moveTo(previewStart.x, previewStart.y);
         ctx.lineTo(previewEnd.x, previewEnd.y);
       } else {
@@ -182,8 +196,22 @@ export function Grid({
       // Draw endpoints for selected line
       if (isSelected) {
         ctx.fillStyle = '#3498db';
-        const startPos = isDraggingThisLine && isDraggingEndpoint === 'start' ? currentPoint : line.start;
-        const endPos = isDraggingThisLine && isDraggingEndpoint === 'end' ? currentPoint : line.end;
+        let startPos, endPos;
+        if (isDraggingThisLine) {
+          if (isDraggingLine) {
+            startPos = startPoint;
+            endPos = currentPoint;
+          } else if (isDraggingEndpoint === 'start') {
+            startPos = currentPoint;
+            endPos = startPoint;
+          } else {
+            startPos = startPoint;
+            endPos = currentPoint;
+          }
+        } else {
+          startPos = line.start;
+          endPos = line.end;
+        }
         
         ctx.beginPath();
         ctx.arc(startPos.x, startPos.y, 6 / zoomLevel, 0, 2 * Math.PI);
@@ -379,6 +407,17 @@ export function Grid({
           setCurrentPoint(snapped);
           return;
         }
+        
+        // Check if clicking on the line body (not endpoint) - for translation
+        if (findLineAtPoint(worldPoint, [selectedLine])) {
+          setIsDraggingLine(true);
+          // Store offset from click point to line start
+          setLineDragOffset({
+            x: worldPoint.x - selectedLine.start.x,
+            y: worldPoint.y - selectedLine.start.y,
+          });
+          return;
+        }
       }
       
       // Check if clicking on any line
@@ -449,6 +488,8 @@ export function Grid({
         canvas.style.cursor = 'move';
       } else if (selectedLine && findEndpointAtPoint(worldPoint, selectedLine, 15 / zoomLevel)) {
         canvas.style.cursor = 'move';
+      } else if (selectedLine && findLineAtPoint(worldPoint, [selectedLine])) {
+        canvas.style.cursor = 'move';
       } else if (findLineAtPoint(worldPoint, lines)) {
         canvas.style.cursor = 'pointer';
       } else {
@@ -458,6 +499,25 @@ export function Grid({
       canvas.style.cursor = spacePressed ? 'grab' : 'crosshair';
     } else if (isPanning) {
       canvas.style.cursor = 'grabbing';
+    }
+
+    // Handle dragging line (translation)
+    if (isDraggingLine && selectedLine && lineDragOffset && onLineEdit) {
+      // Calculate new start position based on drag
+      const newStartX = snapped.x - lineDragOffset.x;
+      const newStartY = snapped.y - lineDragOffset.y;
+      
+      // Calculate the delta to move both endpoints
+      const dx = newStartX - selectedLine.start.x;
+      const dy = newStartY - selectedLine.start.y;
+      
+      const newStart = { x: selectedLine.start.x + dx, y: selectedLine.start.y + dy };
+      const newEnd = { x: selectedLine.end.x + dx, y: selectedLine.end.y + dy };
+      
+      // Store for preview
+      setStartPoint(newStart);
+      setCurrentPoint(newEnd);
+      return;
     }
 
     // Handle dragging endpoint
@@ -503,6 +563,21 @@ export function Grid({
     if (isDraggingFurniture) {
       setIsDraggingFurniture(false);
       setDragOffset(null);
+      return;
+    }
+
+    // Handle line translation end
+    if (isDraggingLine && selectedLine && startPoint && currentPoint && onLineEdit) {
+      // Update line with new translated positions
+      const updates: Partial<Line> = {
+        start: { ...startPoint },
+        end: { ...currentPoint },
+      };
+      onLineEdit(selectedLine.id, updates);
+      setIsDraggingLine(false);
+      setLineDragOffset(null);
+      setStartPoint(null);
+      setCurrentPoint(null);
       return;
     }
 
