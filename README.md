@@ -55,6 +55,13 @@ npm run preview
 - The scale is displayed in the toolbar and used for all measurements
 - Use **Reset** to clear the layout and set a new scale
 
+### Pan and Zoom
+- **Zoom**: Use mouse wheel to zoom in and out
+- **Pan**: Hold **Spacebar** or **Middle Mouse Button** and drag to pan around the canvas
+- The zoom level is displayed in the toolbar (e.g., "Zoom: 100%")
+- Zoom maintains the position under your cursor for easy navigation
+- All elements (grid, lines, furniture) scale together for accurate visualization
+
 ### Drawing Lines
 1. Select **Draw Line** tool from the toolbar
 2. Choose line type: **Wall**, **Door**, or **Window**

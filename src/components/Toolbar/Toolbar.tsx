@@ -11,6 +11,7 @@ interface ToolbarProps {
   onImport: (file: File) => void;
   currentLineLength?: number;
   gridScale: number;
+  zoomLevel: number;
 }
 
 export function Toolbar({
@@ -23,6 +24,7 @@ export function Toolbar({
   onImport,
   currentLineLength,
   gridScale,
+  zoomLevel,
 }: ToolbarProps) {
   const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,6 +61,13 @@ export function Toolbar({
         <h3>Grid Scale</h3>
         <div className="scale-display">
           {gridScale}" per square
+        </div>
+      </div>
+
+      <div className="toolbar-section">
+        <h3>View</h3>
+        <div className="scale-display">
+          Zoom: {(zoomLevel * 100).toFixed(0)}%
         </div>
       </div>
 

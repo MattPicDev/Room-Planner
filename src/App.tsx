@@ -23,6 +23,7 @@ function App() {
   const [gridConfig, setGridConfig] = useState<GridConfig>(DEFAULT_GRID_CONFIG);
   const [showScaleModal, setShowScaleModal] = useState(false);
   const [currentLineLength, setCurrentLineLength] = useState<number | undefined>(undefined);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Load saved data on mount and show scale modal if not set
   useEffect(() => {
@@ -192,6 +193,7 @@ function App() {
         onImport={handleImport}
         currentLineLength={currentLineLength}
         gridScale={gridConfig.inchesPerCell}
+        zoomLevel={zoomLevel}
       />
 
       <main className="app-main">
@@ -261,6 +263,7 @@ function App() {
               onFurnitureMove={handleFurnitureMove}
               selectedFurniture={selectedFurniture}
               onCurrentLineLengthChange={setCurrentLineLength}
+              onZoomChange={setZoomLevel}
             />
           </div>
         </div>

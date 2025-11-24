@@ -18,7 +18,7 @@ A visual room layout application that allows users to design room layouts on a g
 - [x] Configurable grid size (default: 20px squares)
 - [x] Grid scale configuration (inches per square)
 - [x] Scale persistence in storage
-- [ ] Pan and zoom functionality
+- [x] Pan and zoom functionality
 - [x] Grid snapping for objects
 
 ### 2. Line Drawing

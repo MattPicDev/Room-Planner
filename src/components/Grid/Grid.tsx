@@ -23,6 +23,7 @@ interface GridProps {
   onFurnitureMove?: (id: string, position: { x: number; y: number }) => void;
   selectedFurniture?: FurnitureInstance | null;
   onCurrentLineLengthChange?: (length: number | undefined) => void;
+  onZoomChange?: (zoom: number) => void;
 }
 
 export function Grid({ 
@@ -41,6 +42,7 @@ export function Grid({
   onFurnitureMove,
   selectedFurniture,
   onCurrentLineLengthChange,
+  onZoomChange,
 }: GridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -49,6 +51,13 @@ export function Grid({
   const [isDraggingEndpoint, setIsDraggingEndpoint] = useState<'start' | 'end' | null>(null);
   const [isDraggingFurniture, setIsDraggingFurniture] = useState(false);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+  
+  // Pan and zoom state
+  const [viewOffset, setViewOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
+  const [spacePressed, setSpacePressed] = useState(false);
 
   // Calculate current line length and notify parent
   useEffect(() => {
@@ -60,6 +69,46 @@ export function Grid({
     }
   }, [isDrawing, isDraggingEndpoint, startPoint, currentPoint, config.cellSize, config.inchesPerCell, onCurrentLineLengthChange]);
 
+  // Notify parent of zoom level changes
+  useEffect(() => {
+    onZoomChange?.(zoomLevel);
+  }, [zoomLevel, onZoomChange]);
+
+  // Transform screen coordinates to world coordinates (accounting for pan/zoom)
+  const screenToWorld = useCallback((screenX: number, screenY: number) => {
+    return {
+      x: (screenX - viewOffset.x) / zoomLevel,
+      y: (screenY - viewOffset.y) / zoomLevel,
+    };
+  }, [viewOffset, zoomLevel]);
+
+  // Handle spacebar for panning
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault();
+        setSpacePressed(true);
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setSpacePressed(false);
+        setIsPanning(false);
+        setPanStart(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
   // Draw the grid
   const drawGrid = useCallback((ctx: CanvasRenderingContext2D) => {
     const { width, height, cellSize, gridColor, backgroundColor } = config;
@@ -68,34 +117,51 @@ export function Grid({
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, width, height);
 
+    // Save context and apply transform
+    ctx.save();
+    ctx.translate(viewOffset.x, viewOffset.y);
+    ctx.scale(zoomLevel, zoomLevel);
+
     // Draw grid lines
     ctx.strokeStyle = gridColor;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1 / zoomLevel; // Keep grid lines same visual thickness
+
+    // Calculate visible grid range
+    const startX = Math.floor((-viewOffset.x / zoomLevel) / cellSize) * cellSize;
+    const endX = Math.ceil((width - viewOffset.x / zoomLevel) / cellSize) * cellSize;
+    const startY = Math.floor((-viewOffset.y / zoomLevel) / cellSize) * cellSize;
+    const endY = Math.ceil((height - viewOffset.y / zoomLevel) / cellSize) * cellSize;
 
     // Vertical lines
-    for (let x = 0; x <= width; x += cellSize) {
+    for (let x = startX; x <= endX; x += cellSize) {
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
+      ctx.moveTo(x, startY);
+      ctx.lineTo(x, endY);
       ctx.stroke();
     }
 
     // Horizontal lines
-    for (let y = 0; y <= height; y += cellSize) {
+    for (let y = startY; y <= endY; y += cellSize) {
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
+      ctx.moveTo(startX, y);
+      ctx.lineTo(endX, y);
       ctx.stroke();
     }
-  }, [config]);
+
+    ctx.restore();
+  }, [config, viewOffset, zoomLevel]);
 
   // Draw all lines
   const drawLines = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.save();
+    ctx.translate(viewOffset.x, viewOffset.y);
+    ctx.scale(zoomLevel, zoomLevel);
+
     lines.forEach(line => {
       // Highlight selected line
       const isSelected = selectedLine?.id === line.id;
       ctx.strokeStyle = isSelected ? '#3498db' : line.color;
-      ctx.lineWidth = isSelected ? line.thickness + 2 : line.thickness;
+      ctx.lineWidth = (isSelected ? line.thickness + 2 : line.thickness) / zoomLevel;
       
       ctx.beginPath();
       ctx.moveTo(line.start.x, line.start.y);
@@ -106,17 +172,23 @@ export function Grid({
       if (isSelected) {
         ctx.fillStyle = '#3498db';
         ctx.beginPath();
-        ctx.arc(line.start.x, line.start.y, 6, 0, 2 * Math.PI);
+        ctx.arc(line.start.x, line.start.y, 6 / zoomLevel, 0, 2 * Math.PI);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(line.end.x, line.end.y, 6, 0, 2 * Math.PI);
+        ctx.arc(line.end.x, line.end.y, 6 / zoomLevel, 0, 2 * Math.PI);
         ctx.fill();
       }
     });
-  }, [lines, selectedLine]);
+
+    ctx.restore();
+  }, [lines, selectedLine, viewOffset, zoomLevel]);
 
   // Draw furniture
   const drawFurniture = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.save();
+    ctx.translate(viewOffset.x, viewOffset.y);
+    ctx.scale(zoomLevel, zoomLevel);
+
     furniture.forEach(item => {
       const template = furnitureTemplates.find(t => t.id === item.templateId);
       if (!template) return;
@@ -144,12 +216,12 @@ export function Grid({
       
       // Draw border
       ctx.strokeStyle = isSelected ? '#3498db' : '#333';
-      ctx.lineWidth = isSelected ? 3 : 1;
+      ctx.lineWidth = (isSelected ? 3 : 1) / zoomLevel;
       ctx.strokeRect(x, y, w, h);
       
       // Draw name
       ctx.fillStyle = '#fff';
-      ctx.font = '12px sans-serif';
+      ctx.font = `${12 / zoomLevel}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(template.name, x + w / 2, y + h / 2);
@@ -158,7 +230,8 @@ export function Grid({
     // Draw preview furniture while placing
     if (mode === 'furniture' && selectedTemplate && currentPoint) {
       const { cellSize, inchesPerCell } = config;
-      const gridPos = canvasToGrid(currentPoint, cellSize);
+      const worldPoint = screenToWorld(currentPoint.x, currentPoint.y);
+      const gridPos = canvasToGrid(worldPoint, cellSize);
       const x = gridPos.x * cellSize;
       const y = gridPos.y * cellSize;
       
@@ -173,26 +246,34 @@ export function Grid({
       ctx.fillRect(x, y, w, h);
       ctx.globalAlpha = 1.0;
       ctx.strokeStyle = '#333';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 2 / zoomLevel;
+      ctx.setLineDash([5 / zoomLevel, 5 / zoomLevel]);
       ctx.strokeRect(x, y, w, h);
       ctx.setLineDash([]);
     }
-  }, [furniture, furnitureTemplates, selectedFurniture, mode, selectedTemplate, currentPoint, config]);
+
+    ctx.restore();
+  }, [furniture, furnitureTemplates, selectedFurniture, mode, selectedTemplate, currentPoint, config, viewOffset, zoomLevel, screenToWorld]);
 
   // Draw preview line while drawing
   const drawPreview = useCallback((ctx: CanvasRenderingContext2D) => {
     if (startPoint && currentPoint && mode === 'draw') {
+      ctx.save();
+      ctx.translate(viewOffset.x, viewOffset.y);
+      ctx.scale(zoomLevel, zoomLevel);
+
       ctx.strokeStyle = '#666666';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 2 / zoomLevel;
+      ctx.setLineDash([5 / zoomLevel, 5 / zoomLevel]);
       ctx.beginPath();
       ctx.moveTo(startPoint.x, startPoint.y);
       ctx.lineTo(currentPoint.x, currentPoint.y);
       ctx.stroke();
       ctx.setLineDash([]);
+
+      ctx.restore();
     }
-  }, [startPoint, currentPoint, mode]);
+  }, [startPoint, currentPoint, mode, viewOffset, zoomLevel]);
 
   // Main render effect
   useEffect(() => {
@@ -214,11 +295,21 @@ export function Grid({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const point = { x, y };
-    const snapped = snapToGrid(point, config.cellSize);
-    const gridPos = canvasToGrid(point, config.cellSize);
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+
+    // Handle panning with space or middle mouse button
+    if (spacePressed || e.button === 1) {
+      e.preventDefault();
+      setIsPanning(true);
+      setPanStart({ x: screenX, y: screenY });
+      return;
+    }
+
+    // Convert to world coordinates
+    const worldPoint = screenToWorld(screenX, screenY);
+    const snapped = snapToGrid(worldPoint, config.cellSize);
+    const gridPos = canvasToGrid(worldPoint, config.cellSize);
 
     if (mode === 'furniture') {
       // Check if clicking on existing furniture to select/drag
@@ -264,7 +355,7 @@ export function Grid({
       
       // Check if clicking on selected line's endpoint
       if (selectedLine) {
-        const endpoint = findEndpointAtPoint(point, selectedLine, 15);
+        const endpoint = findEndpointAtPoint(worldPoint, selectedLine, 15 / zoomLevel);
         if (endpoint) {
           setIsDraggingEndpoint(endpoint);
           setStartPoint(endpoint === 'start' ? selectedLine.end : selectedLine.start);
@@ -274,7 +365,7 @@ export function Grid({
       }
       
       // Check if clicking on any line
-      const clickedLine = findLineAtPoint(point, lines);
+      const clickedLine = findLineAtPoint(worldPoint, lines);
       if (clickedLine) {
         onLineSelect?.(clickedLine);
         onFurnitureSelect?.(null);
@@ -295,15 +386,28 @@ export function Grid({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const snapped = snapToGrid({ x, y }, config.cellSize);
-    const gridPos = canvasToGrid({ x, y }, config.cellSize);
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+
+    // Handle panning
+    if (isPanning && panStart) {
+      const dx = screenX - panStart.x;
+      const dy = screenY - panStart.y;
+      setViewOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+      setPanStart({ x: screenX, y: screenY });
+      return;
+    }
+
+    // Convert to world coordinates
+    const worldPoint = screenToWorld(screenX, screenY);
+    const snapped = snapToGrid(worldPoint, config.cellSize);
+    const gridPos = canvasToGrid(worldPoint, config.cellSize);
 
     // Update preview position for furniture placement
     if (mode === 'furniture') {
-      setCurrentPoint({ x, y });
-      canvas.style.cursor = selectedTemplate ? 'copy' : 'default';
+      setCurrentPoint({ x: screenX, y: screenY });
+      canvas.style.cursor = (spacePressed || isPanning) ? 'grab' : (selectedTemplate ? 'copy' : 'default');
+      return;
     }
 
     // Handle dragging furniture
@@ -317,9 +421,7 @@ export function Grid({
     }
 
     // Update cursor based on hover state
-    if (mode === 'select' && !isDrawing && !isDraggingEndpoint && !isDraggingFurniture) {
-      const point = { x, y };
-      
+    if (mode === 'select' && !isDrawing && !isDraggingEndpoint && !isDraggingFurniture && !isPanning) {
       // Check furniture hover
       const hoveredFurniture = furniture.find(item => {
         const template = furnitureTemplates.find(t => t.id === item.templateId);
@@ -328,15 +430,17 @@ export function Grid({
       
       if (hoveredFurniture) {
         canvas.style.cursor = 'move';
-      } else if (selectedLine && findEndpointAtPoint(point, selectedLine, 15)) {
+      } else if (selectedLine && findEndpointAtPoint(worldPoint, selectedLine, 15 / zoomLevel)) {
         canvas.style.cursor = 'move';
-      } else if (findLineAtPoint(point, lines)) {
+      } else if (findLineAtPoint(worldPoint, lines)) {
         canvas.style.cursor = 'pointer';
       } else {
-        canvas.style.cursor = 'default';
+        canvas.style.cursor = spacePressed ? 'grab' : 'default';
       }
-    } else if (mode === 'draw') {
-      canvas.style.cursor = 'crosshair';
+    } else if (mode === 'draw' && !isPanning) {
+      canvas.style.cursor = spacePressed ? 'grab' : 'crosshair';
+    } else if (isPanning) {
+      canvas.style.cursor = 'grabbing';
     }
 
     // Handle dragging endpoint
@@ -371,6 +475,13 @@ export function Grid({
 
   // Handle mouse up
   const handleMouseUp = () => {
+    // Handle panning end
+    if (isPanning) {
+      setIsPanning(false);
+      setPanStart(null);
+      return;
+    }
+
     // Handle furniture dragging end
     if (isDraggingFurniture) {
       setIsDraggingFurniture(false);
@@ -415,6 +526,37 @@ export function Grid({
     setCurrentPoint(null);
   };
 
+  // Handle mouse wheel for zooming
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // Calculate world position before zoom
+    const worldBefore = screenToWorld(mouseX, mouseY);
+
+    // Update zoom level
+    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.1, Math.min(5, zoomLevel * zoomFactor));
+    setZoomLevel(newZoom);
+
+    // Calculate world position after zoom (to maintain mouse position)
+    const worldAfter = {
+      x: (mouseX - viewOffset.x) / newZoom,
+      y: (mouseY - viewOffset.y) / newZoom,
+    };
+
+    // Adjust offset to keep mouse position stable
+    setViewOffset({
+      x: viewOffset.x + (worldAfter.x - worldBefore.x) * newZoom,
+      y: viewOffset.y + (worldAfter.y - worldBefore.y) * newZoom,
+    });
+  };
+
   return (
     <div className="grid-container">
       <canvas
@@ -425,6 +567,7 @@ export function Grid({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
         className="grid-canvas"
       />
     </div>
