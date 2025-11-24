@@ -160,28 +160,42 @@ export function Grid({
     lines.forEach(line => {
       // Highlight selected line
       const isSelected = selectedLine?.id === line.id;
+      const isDraggingThisLine = isSelected && isDraggingEndpoint && startPoint && currentPoint;
+      
       ctx.strokeStyle = isSelected ? '#3498db' : line.color;
       ctx.lineWidth = (isSelected ? line.thickness + 2 : line.thickness) / zoomLevel;
       
+      // Draw the line with preview if being dragged
       ctx.beginPath();
-      ctx.moveTo(line.start.x, line.start.y);
-      ctx.lineTo(line.end.x, line.end.y);
+      if (isDraggingThisLine) {
+        // Show preview of line being edited
+        const previewStart = isDraggingEndpoint === 'start' ? currentPoint : line.start;
+        const previewEnd = isDraggingEndpoint === 'end' ? currentPoint : line.end;
+        ctx.moveTo(previewStart.x, previewStart.y);
+        ctx.lineTo(previewEnd.x, previewEnd.y);
+      } else {
+        ctx.moveTo(line.start.x, line.start.y);
+        ctx.lineTo(line.end.x, line.end.y);
+      }
       ctx.stroke();
       
       // Draw endpoints for selected line
       if (isSelected) {
         ctx.fillStyle = '#3498db';
+        const startPos = isDraggingThisLine && isDraggingEndpoint === 'start' ? currentPoint : line.start;
+        const endPos = isDraggingThisLine && isDraggingEndpoint === 'end' ? currentPoint : line.end;
+        
         ctx.beginPath();
-        ctx.arc(line.start.x, line.start.y, 6 / zoomLevel, 0, 2 * Math.PI);
+        ctx.arc(startPos.x, startPos.y, 6 / zoomLevel, 0, 2 * Math.PI);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(line.end.x, line.end.y, 6 / zoomLevel, 0, 2 * Math.PI);
+        ctx.arc(endPos.x, endPos.y, 6 / zoomLevel, 0, 2 * Math.PI);
         ctx.fill();
       }
     });
 
     ctx.restore();
-  }, [lines, selectedLine, viewOffset, zoomLevel]);
+  }, [lines, selectedLine, viewOffset, zoomLevel, isDraggingEndpoint, startPoint, currentPoint]);
 
   // Draw furniture
   const drawFurniture = useCallback((ctx: CanvasRenderingContext2D) => {
