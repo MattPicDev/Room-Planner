@@ -33,7 +33,45 @@
 .app-main {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 20px;
+}
+
+.selection-info {
+  background: #fff;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+}
+
+.selection-details {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.selection-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
 }

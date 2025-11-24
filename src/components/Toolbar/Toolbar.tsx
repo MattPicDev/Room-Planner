@@ -48,8 +48,6 @@ export function Toolbar({
         <button
           className={selectedTool === 'select' ? 'active' : ''}
           onClick={() => onToolChange('select')}
-          disabled
-          title="Coming soon"
         >
           Select
         </button>

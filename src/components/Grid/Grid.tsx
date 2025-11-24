@@ -2,21 +2,25 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import type { GridConfig } from '../../types/grid';
 import type { Line } from '../../types/line';
 import { snapToGrid } from '../../utils/gridHelpers';
+import { findLineAtPoint, findEndpointAtPoint } from '../../utils/lineHelpers';
 import './Grid.css';
 
 interface GridProps {
   config: GridConfig;
   lines: Line[];
+  mode: 'draw' | 'select';
   onLineAdd?: (line: Line) => void;
   onLineEdit?: (lineId: string, updates: Partial<Line>) => void;
-  onLineDelete?: (lineId: string) => void;
+  onLineSelect?: (line: Line | null) => void;
+  selectedLine?: Line | null;
 }
 
-export function Grid({ config, lines, onLineAdd }: GridProps) {
+export function Grid({ config, lines, mode, onLineAdd, onLineEdit, onLineSelect, selectedLine }: GridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
   const [currentPoint, setCurrentPoint] = useState<{ x: number; y: number } | null>(null);
+  const [isDraggingEndpoint, setIsDraggingEndpoint] = useState<'start' | 'end' | null>(null);
 
   // Draw the grid
   const drawGrid = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -50,14 +54,28 @@ export function Grid({ config, lines, onLineAdd }: GridProps) {
   // Draw all lines
   const drawLines = useCallback((ctx: CanvasRenderingContext2D) => {
     lines.forEach(line => {
-      ctx.strokeStyle = line.color;
-      ctx.lineWidth = line.thickness;
+      // Highlight selected line
+      const isSelected = selectedLine?.id === line.id;
+      ctx.strokeStyle = isSelected ? '#3498db' : line.color;
+      ctx.lineWidth = isSelected ? line.thickness + 2 : line.thickness;
+      
       ctx.beginPath();
       ctx.moveTo(line.start.x, line.start.y);
       ctx.lineTo(line.end.x, line.end.y);
       ctx.stroke();
+      
+      // Draw endpoints for selected line
+      if (isSelected) {
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.arc(line.start.x, line.start.y, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(line.end.x, line.end.y, 6, 0, 2 * Math.PI);
+        ctx.fill();
+      }
     });
-  }, [lines]);
+  }, [lines, selectedLine]);
 
   // Draw preview line while drawing
   const drawPreview = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -94,17 +112,37 @@ export function Grid({ config, lines, onLineAdd }: GridProps) {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const snapped = snapToGrid({ x, y }, config.cellSize);
+    const point = { x, y };
+    const snapped = snapToGrid(point, config.cellSize);
 
-    setIsDrawing(true);
-    setStartPoint(snapped);
-    setCurrentPoint(snapped);
+    if (mode === 'select') {
+      // Check if clicking on selected line's endpoint
+      if (selectedLine) {
+        const endpoint = findEndpointAtPoint(point, selectedLine, 15);
+        if (endpoint) {
+          setIsDraggingEndpoint(endpoint);
+          setStartPoint(endpoint === 'start' ? selectedLine.end : selectedLine.start);
+          setCurrentPoint(snapped);
+          return;
+        }
+      }
+      
+      // Check if clicking on any line
+      const clickedLine = findLineAtPoint(point, lines);
+      if (clickedLine) {
+        onLineSelect?.(clickedLine);
+      } else {
+        onLineSelect?.(null);
+      }
+    } else if (mode === 'draw') {
+      setIsDrawing(true);
+      setStartPoint(snapped);
+      setCurrentPoint(snapped);
+    }
   };
 
   // Handle mouse move
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -113,22 +151,70 @@ export function Grid({ config, lines, onLineAdd }: GridProps) {
     const y = e.clientY - rect.top;
     const snapped = snapToGrid({ x, y }, config.cellSize);
 
-    // Constrain to horizontal or vertical
-    if (startPoint) {
+    // Update cursor based on hover state
+    if (mode === 'select' && !isDrawing && !isDraggingEndpoint) {
+      const point = { x, y };
+      if (selectedLine && findEndpointAtPoint(point, selectedLine, 15)) {
+        canvas.style.cursor = 'move';
+      } else if (findLineAtPoint(point, lines)) {
+        canvas.style.cursor = 'pointer';
+      } else {
+        canvas.style.cursor = 'default';
+      }
+    } else if (mode === 'draw') {
+      canvas.style.cursor = 'crosshair';
+    }
+
+    // Handle dragging endpoint
+    if (isDraggingEndpoint && selectedLine && startPoint && onLineEdit) {
+      // Constrain to horizontal or vertical
       const dx = Math.abs(snapped.x - startPoint.x);
       const dy = Math.abs(snapped.y - startPoint.y);
+      
+      const constrainedPoint = dx > dy
+        ? { x: snapped.x, y: startPoint.y }
+        : { x: startPoint.x, y: snapped.y };
+      
+      setCurrentPoint(constrainedPoint);
+      return;
+    }
 
-      if (dx > dy) {
-        setCurrentPoint({ x: snapped.x, y: startPoint.y });
-      } else {
-        setCurrentPoint({ x: startPoint.x, y: snapped.y });
+    // Handle drawing new line
+    if (isDrawing && mode === 'draw') {
+      if (startPoint) {
+        // Constrain to horizontal or vertical
+        const dx = Math.abs(snapped.x - startPoint.x);
+        const dy = Math.abs(snapped.y - startPoint.y);
+
+        if (dx > dy) {
+          setCurrentPoint({ x: snapped.x, y: startPoint.y });
+        } else {
+          setCurrentPoint({ x: startPoint.x, y: snapped.y });
+        }
       }
     }
   };
 
   // Handle mouse up
   const handleMouseUp = () => {
-    if (isDrawing && startPoint && currentPoint && onLineAdd) {
+    // Handle endpoint dragging
+    if (isDraggingEndpoint && selectedLine && currentPoint && startPoint && onLineEdit) {
+      // Only update if the line has length
+      if (currentPoint.x !== startPoint.x || currentPoint.y !== startPoint.y) {
+        const updates: Partial<Line> = isDraggingEndpoint === 'start'
+          ? { start: currentPoint, end: startPoint }
+          : { start: startPoint, end: currentPoint };
+        
+        onLineEdit(selectedLine.id, updates);
+      }
+      setIsDraggingEndpoint(null);
+      setStartPoint(null);
+      setCurrentPoint(null);
+      return;
+    }
+
+    // Handle drawing new line
+    if (isDrawing && startPoint && currentPoint && onLineAdd && mode === 'draw') {
       // Only add line if it has length
       if (startPoint.x !== currentPoint.x || startPoint.y !== currentPoint.y) {
         const newLine: Line = {

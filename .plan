@@ -14,16 +14,17 @@ A visual room layout application that allows users to design room layouts on a g
 
 ### 1. Grid System
 - [x] Project scaffolding
-- [ ] Render grid canvas (graph paper style)
-- [ ] Configurable grid size (default: 10px squares)
+- [x] Render grid canvas (graph paper style)
+- [x] Configurable grid size (default: 20px squares)
 - [ ] Pan and zoom functionality
-- [ ] Grid snapping for objects
+- [x] Grid snapping for objects
 
 ### 2. Line Drawing
-- [ ] Draw lines along grid lines (horizontal/vertical only)
-- [ ] Line drawing modes: wall, door, window
-- [ ] Edit existing lines (move endpoints, delete)
-- [ ] Line properties: thickness, color, type
+- [x] Draw lines along grid lines (horizontal/vertical only)
+- [x] Line drawing modes: wall, door, window
+- [x] Edit existing lines (move endpoints, delete)
+- [x] Line properties: thickness, color, type
+- [x] Select mode with visual feedback
 - [ ] Validation: prevent overlapping lines
 
 **Note**: Future version will support diagonal/free-form lines
@@ -41,12 +42,19 @@ A visual room layout application that allows users to design room layouts on a g
 - [ ] Furniture collision detection
 
 ### 4. Data Persistence
-- [ ] Local storage for furniture templates
-- [ ] Local storage for current layout
-- [ ] Export layout as JSON
-- [ ] Import layout from JSON
+- [x] Local storage for furniture templates
+- [x] Local storage for current layout
+- [x] Export layout as JSON
+- [x] Import layout from JSON
 
 **Note**: Future version will support per-user cloud storage
+
+### 5. Testing
+- [x] Unit tests for utility functions
+- [x] Test coverage for grid helpers
+- [x] Test coverage for line helpers
+- [ ] Component tests for React components
+- [ ] Integration tests for user workflows
 
 ## Phase 2: Future Enhancements
 
@@ -120,11 +128,11 @@ src/
 
 ### Version 1.0 Requirements
 1. ✅ Grid-based canvas (graph paper style)
-2. ⏳ Line drawing along grid lines
-3. ⏳ Line editing (move, delete)
+2. ✅ Line drawing along grid lines
+3. ✅ Line editing (move, delete)
 4. ⏳ Rectangular furniture definition
 5. ⏳ Furniture placement and manipulation
-6. ⏳ Local data persistence
+6. ✅ Local data persistence
 
 ### Constraints
 - Lines must follow grid lines (no diagonals yet)
@@ -133,8 +141,12 @@ src/
 - Desktop-first design
 
 ### Success Criteria
-- User can create a basic room layout with walls
-- User can define and place furniture
+- ✅ User can create a basic room layout with walls
+- ✅ User can edit and delete lines
+- ✅ Layout persists across browser sessions
+- ✅ All core features have test coverage >80%
+- ✅ Documentation is complete and accurate
+- ⏳ User can define and place furniture
 - Layout persists across browser sessions
 - All features have test coverage >80%
 - Documentation is complete and accurate

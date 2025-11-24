@@ -11,6 +11,7 @@ function App() {
   const [lines, setLines] = useState<Line[]>([]);
   const [selectedTool, setSelectedTool] = useState<'line' | 'furniture' | 'select'>('line');
   const [selectedLineType, setSelectedLineType] = useState<LineType>('wall');
+  const [selectedLine, setSelectedLine] = useState<Line | null>(null);
 
   // Load saved data on mount
   useEffect(() => {
@@ -43,11 +44,13 @@ function App() {
 
   const handleLineDelete = (lineId: string) => {
     setLines(lines.filter(line => line.id !== lineId));
+    setSelectedLine(null);
   };
 
   const handleClear = () => {
     if (confirm('Are you sure you want to clear all lines?')) {
       setLines([]);
+      setSelectedLine(null);
     }
   };
 
@@ -87,7 +90,10 @@ function App() {
       <Toolbar
         selectedTool={selectedTool}
         selectedLineType={selectedLineType}
-        onToolChange={setSelectedTool}
+        onToolChange={(tool) => {
+          setSelectedTool(tool);
+          setSelectedLine(null);
+        }}
         onLineTypeChange={setSelectedLineType}
         onClear={handleClear}
         onExport={handleExport}
@@ -95,12 +101,31 @@ function App() {
       />
 
       <main className="app-main">
+        {selectedLine && (
+          <div className="selection-info">
+            <div className="selection-details">
+              <span className="selection-label">
+                Selected: {selectedLine.type.charAt(0).toUpperCase() + selectedLine.type.slice(1)}
+              </span>
+              <button 
+                className="delete-button"
+                onClick={() => handleLineDelete(selectedLine.id)}
+              >
+                Delete Line
+              </button>
+            </div>
+          </div>
+        )}
+        
         <Grid
           config={DEFAULT_GRID_CONFIG}
           lines={lines}
+          mode={selectedTool === 'line' ? 'draw' : 'select'}
           onLineAdd={handleLineAdd}
           onLineEdit={handleLineEdit}
           onLineDelete={handleLineDelete}
+          onLineSelect={setSelectedLine}
+          selectedLine={selectedLine}
         />
       </main>
     </div>
