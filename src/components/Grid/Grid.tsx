@@ -63,13 +63,13 @@ export function Grid({
 
   // Calculate current line length and notify parent
   useEffect(() => {
-    if ((isDrawing || isDraggingEndpoint) && startPoint && currentPoint && onCurrentLineLengthChange) {
+    if ((isDrawing || isDraggingEndpoint || isDraggingLine) && startPoint && currentPoint && onCurrentLineLengthChange) {
       const length = calculateLineLength(startPoint, currentPoint, config.cellSize, config.inchesPerCell);
       onCurrentLineLengthChange(length);
     } else if (onCurrentLineLengthChange) {
       onCurrentLineLengthChange(undefined);
     }
-  }, [isDrawing, isDraggingEndpoint, startPoint, currentPoint, config.cellSize, config.inchesPerCell, onCurrentLineLengthChange]);
+  }, [isDrawing, isDraggingEndpoint, isDraggingLine, startPoint, currentPoint, config.cellSize, config.inchesPerCell, onCurrentLineLengthChange]);
 
   // Notify parent of zoom level changes
   useEffect(() => {
