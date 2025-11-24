@@ -8,14 +8,17 @@ A visual room layout application built with React, TypeScript, and Vite. Design 
 - **Grid-based Canvas**: Graph paper style layout with configurable grid size
 - **Line Drawing**: Draw walls, doors, and windows along grid lines
 - **Line Editing**: Select lines, drag endpoints to resize/move, and delete lines
-- **Interactive Tools**: Draw mode and select mode with visual feedback
-- **Data Persistence**: Automatically saves your layout to local storage
-- **Import/Export**: Save and load layouts as JSON files
-- **Testing**: Comprehensive test suite with 29+ unit tests
+- **Furniture Management**: Create custom furniture templates and place them in your room
+- **Furniture Editing**: Move and rotate furniture with drag-and-drop
+- **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
+- **Data Persistence**: Automatically saves layouts and furniture to local storage
+- **Import/Export**: Save and load complete layouts as JSON files
+- **Testing**: Comprehensive test suite with 53+ unit tests
 
 ### Planned Features
 - Diagonal and curved line drawing
-- Furniture placement and management
+- Furniture collision prevention
+- Non-rectangular furniture shapes
 - Undo/redo functionality
 - Measurements and dimensions
 - Export to image/PDF
@@ -58,6 +61,19 @@ npm run preview
 4. Click **Delete Line** button to remove the selected line
 5. Click elsewhere to deselect
 
+### Managing Furniture
+1. Click **Furniture** tool to open the furniture library
+2. Click **+ Add Furniture** to create a new template:
+   - Enter name (e.g., "Sofa", "Table", "Bed")
+   - Set dimensions in grid squares (width × height)
+   - Choose a color
+   - Optionally add a category
+3. Click on a template to select it for placement
+4. Click on the grid to place furniture
+5. Use **Select** tool to move furniture by dragging
+6. With furniture selected, use **Rotate 90°** to rotate
+7. Click **Delete** to remove furniture from the room
+
 ### Saving and Loading
 - Layouts are automatically saved to browser local storage
 - Use **Export** to save as a JSON file
@@ -69,14 +85,19 @@ npm run preview
 ```
 src/
 ├── components/
-│   ├── Grid/           # Main canvas component
-│   └── Toolbar/        # Tool selection UI
-├── types/              # TypeScript type definitions
-├── utils/              # Helper functions
+│   ├── Grid/              # Main canvas component
+│   ├── Toolbar/           # Tool selection UI
+│   └── FurnitureLibrary/  # Furniture template manager
+├── types/                 # TypeScript type definitions
+│   ├── grid.ts
+│   ├── line.ts
+│   └── furniture.ts
+├── utils/                 # Helper functions
 │   ├── gridHelpers.ts
+│   ├── lineHelpers.ts
 │   ├── collisionDetection.ts
 │   └── storage.ts
-└── App.tsx             # Main application
+└── App.tsx                # Main application
 ```
 
 ## Development

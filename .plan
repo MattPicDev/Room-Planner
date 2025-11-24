@@ -30,16 +30,16 @@ A visual room layout application that allows users to design room layouts on a g
 **Note**: Future version will support diagonal/free-form lines
 
 ### 3. Furniture Management
-- [ ] Define furniture templates (rectangular shapes)
+- [x] Define furniture templates (rectangular shapes)
   - Name
   - Dimensions (width x height in grid squares)
   - Color/style
-- [ ] Furniture library/palette
-- [ ] Place furniture on grid
-- [ ] Move furniture (drag and drop)
-- [ ] Rotate furniture (90° increments)
-- [ ] Delete furniture from layout
-- [ ] Furniture collision detection
+- [x] Furniture library/palette
+- [x] Place furniture on grid
+- [x] Move furniture (drag and drop)
+- [x] Rotate furniture (90° increments)
+- [x] Delete furniture from layout
+- [x] Furniture collision detection helpers
 
 ### 4. Data Persistence
 - [x] Local storage for furniture templates

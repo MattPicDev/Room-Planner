@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Grid } from './components/Grid/Grid';
 import { Toolbar } from './components/Toolbar/Toolbar';
+import { FurnitureLibrary } from './components/FurnitureLibrary/FurnitureLibrary';
 import type { Line, LineType } from './types/line';
+import type { FurnitureTemplate, FurnitureInstance } from './types/furniture';
 import { DEFAULT_GRID_CONFIG } from './types/grid';
 import { LINE_DEFAULTS } from './types/line';
-import { saveLines, loadLines, exportLayout, importLayout } from './utils/storage';
+import { saveLines, loadLines, exportLayout, importLayout, saveFurnitureTemplates, loadFurnitureTemplates } from './utils/storage';
 import './App.css';
 
 function App() {
@@ -12,17 +14,28 @@ function App() {
   const [selectedTool, setSelectedTool] = useState<'line' | 'furniture' | 'select'>('line');
   const [selectedLineType, setSelectedLineType] = useState<LineType>('wall');
   const [selectedLine, setSelectedLine] = useState<Line | null>(null);
+  const [furnitureTemplates, setFurnitureTemplates] = useState<FurnitureTemplate[]>([]);
+  const [furniture, setFurniture] = useState<FurnitureInstance[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<FurnitureTemplate | null>(null);
+  const [selectedFurniture, setSelectedFurniture] = useState<FurnitureInstance | null>(null);
 
   // Load saved data on mount
   useEffect(() => {
     const savedLines = loadLines();
     setLines(savedLines);
+    const savedTemplates = loadFurnitureTemplates();
+    setFurnitureTemplates(savedTemplates);
   }, []);
 
   // Save lines whenever they change
   useEffect(() => {
     saveLines(lines);
   }, [lines]);
+
+  // Save furniture templates whenever they change
+  useEffect(() => {
+    saveFurnitureTemplates(furnitureTemplates);
+  }, [furnitureTemplates]);
 
   const handleLineAdd = (line: Line) => {
     // Apply current line type settings
@@ -52,6 +65,54 @@ function App() {
       setLines([]);
       setSelectedLine(null);
     }
+  };
+
+  // Furniture handlers
+  const handleAddFurnitureTemplate = (template: Omit<FurnitureTemplate, 'id'>) => {
+    const newTemplate: FurnitureTemplate = {
+      ...template,
+      id: crypto.randomUUID(),
+    };
+    setFurnitureTemplates([...furnitureTemplates, newTemplate]);
+  };
+
+  const handleDeleteFurnitureTemplate = (id: string) => {
+    setFurnitureTemplates(furnitureTemplates.filter(t => t.id !== id));
+    if (selectedTemplate?.id === id) {
+      setSelectedTemplate(null);
+    }
+    // Remove all furniture instances using this template
+    setFurniture(furniture.filter(f => f.templateId !== id));
+  };
+
+  const handleSelectTemplate = (template: FurnitureTemplate) => {
+    setSelectedTemplate(template);
+    setSelectedTool('furniture');
+  };
+
+  const handleFurnitureAdd = (item: FurnitureInstance) => {
+    setFurniture([...furniture, item]);
+  };
+
+  const handleFurnitureMove = (id: string, position: { x: number; y: number }) => {
+    setFurniture(furniture.map(f => 
+      f.id === id ? { ...f, position } : f
+    ));
+  };
+
+  const handleFurnitureDelete = (id: string) => {
+    setFurniture(furniture.filter(f => f.id !== id));
+    setSelectedFurniture(null);
+  };
+
+  const handleFurnitureRotate = (id: string) => {
+    setFurniture(furniture.map(f => {
+      if (f.id === id) {
+        const newRotation = ((f.rotation + 90) % 360) as 0 | 90 | 180 | 270;
+        return { ...f, rotation: newRotation };
+      }
+      return f;
+    }));
   };
 
   const handleExport = () => {
@@ -101,31 +162,74 @@ function App() {
       />
 
       <main className="app-main">
-        {selectedLine && (
-          <div className="selection-info">
-            <div className="selection-details">
-              <span className="selection-label">
-                Selected: {selectedLine.type.charAt(0).toUpperCase() + selectedLine.type.slice(1)}
-              </span>
-              <button 
-                className="delete-button"
-                onClick={() => handleLineDelete(selectedLine.id)}
-              >
-                Delete Line
-              </button>
-            </div>
+        <div className="layout-container">
+          {(selectedTool === 'furniture' || furnitureTemplates.length > 0) && (
+            <FurnitureLibrary
+              templates={furnitureTemplates}
+              onAddTemplate={handleAddFurnitureTemplate}
+              onDeleteTemplate={handleDeleteFurnitureTemplate}
+              onSelectTemplate={handleSelectTemplate}
+              selectedTemplateId={selectedTemplate?.id}
+            />
+          )}
+
+          <div className="grid-section">
+            {selectedLine && (
+              <div className="selection-info">
+                <div className="selection-details">
+                  <span className="selection-label">
+                    Selected: {selectedLine.type.charAt(0).toUpperCase() + selectedLine.type.slice(1)}
+                  </span>
+                  <button 
+                    className="delete-button"
+                    onClick={() => handleLineDelete(selectedLine.id)}
+                  >
+                    Delete Line
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {selectedFurniture && (
+              <div className="selection-info">
+                <div className="selection-details">
+                  <span className="selection-label">
+                    Selected: {furnitureTemplates.find(t => t.id === selectedFurniture.templateId)?.name}
+                  </span>
+                  <button 
+                    className="action-button"
+                    onClick={() => handleFurnitureRotate(selectedFurniture.id)}
+                  >
+                    Rotate 90°
+                  </button>
+                  <button 
+                    className="delete-button"
+                    onClick={() => handleFurnitureDelete(selectedFurniture.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            <Grid
+              config={DEFAULT_GRID_CONFIG}
+              lines={lines}
+              furniture={furniture}
+              furnitureTemplates={furnitureTemplates}
+              mode={selectedTool === 'line' ? 'draw' : selectedTool === 'furniture' ? 'furniture' : 'select'}
+              selectedTemplate={selectedTemplate}
+              onLineAdd={handleLineAdd}
+              onLineEdit={handleLineEdit}
+              onLineSelect={setSelectedLine}
+              selectedLine={selectedLine}
+              onFurnitureAdd={handleFurnitureAdd}
+              onFurnitureSelect={setSelectedFurniture}
+              onFurnitureMove={handleFurnitureMove}
+              selectedFurniture={selectedFurniture}
+            />
           </div>
-        )}
-        
-        <Grid
-          config={DEFAULT_GRID_CONFIG}
-          lines={lines}
-          mode={selectedTool === 'line' ? 'draw' : 'select'}
-          onLineAdd={handleLineAdd}
-          onLineEdit={handleLineEdit}
-          onLineSelect={setSelectedLine}
-          selectedLine={selectedLine}
-        />
+        </div>
       </main>
     </div>
   );
