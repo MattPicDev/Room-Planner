@@ -18,5 +18,5 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   height: 600,
   gridColor: '#d0d0d0',
   backgroundColor: '#ffffff',
-  inchesPerCell: 12, // Default: 12 inches (1 foot) per cell
+  inchesPerCell: 6, // Default: 6 inches per cell
 };

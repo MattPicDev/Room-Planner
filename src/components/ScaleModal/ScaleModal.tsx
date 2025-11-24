@@ -9,7 +9,7 @@ interface ScaleModalProps {
 }
 
 export function ScaleModal({ isOpen, currentScale, onConfirm, onCancel }: ScaleModalProps) {
-  const [inchesPerCell, setInchesPerCell] = useState<string>(currentScale?.toString() || '12');
+  const [inchesPerCell, setInchesPerCell] = useState<string>(currentScale?.toString() || '6');
   const [error, setError] = useState<string>('');
 
   if (!isOpen) return null;
