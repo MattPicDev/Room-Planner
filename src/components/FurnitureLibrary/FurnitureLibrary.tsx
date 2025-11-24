@@ -120,8 +120,8 @@ export function FurnitureLibrary({
                 className="template-preview"
                 style={{
                   backgroundColor: template.color,
-                  width: `${template.width * 10}px`,
-                  height: `${template.height * 10}px`,
+                  width: `${Math.max(20, Math.min(80, template.width / 2))}px`,
+                  height: `${Math.max(20, Math.min(80, template.height / 2))}px`,
                 }}
               />
               <div className="template-info">
