@@ -126,11 +126,11 @@ export function Grid({
     ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1 / zoomLevel; // Keep grid lines same visual thickness
 
-    // Calculate visible grid range
+    // Calculate visible grid range (accounting for zoom and pan)
     const startX = Math.floor((-viewOffset.x / zoomLevel) / cellSize) * cellSize;
-    const endX = Math.ceil((width - viewOffset.x / zoomLevel) / cellSize) * cellSize;
+    const endX = Math.ceil((width / zoomLevel - viewOffset.x / zoomLevel) / cellSize) * cellSize;
     const startY = Math.floor((-viewOffset.y / zoomLevel) / cellSize) * cellSize;
-    const endY = Math.ceil((height - viewOffset.y / zoomLevel) / cellSize) * cellSize;
+    const endY = Math.ceil((height / zoomLevel - viewOffset.y / zoomLevel) / cellSize) * cellSize;
 
     // Vertical lines
     for (let x = startX; x <= endX; x += cellSize) {

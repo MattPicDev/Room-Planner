@@ -9,6 +9,8 @@ const mockConfig: GridConfig = {
   width: 800,
   height: 600,
   inchesPerCell: 12,
+  gridColor: '#ddd',
+  backgroundColor: '#fff',
 };
 
 const mockTemplates: FurnitureTemplate[] = [
@@ -129,6 +131,8 @@ describe('Grid Pan/Zoom', () => {
             start: { x: 0, y: 0 },
             end: { x: 100, y: 100 },
             type: 'wall',
+            thickness: 3,
+            color: '#000',
           },
         ]}
         furniture={[
