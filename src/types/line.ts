@@ -1,4 +1,4 @@
-import { Point } from './grid';
+import type { Point } from './grid';
 
 export type LineType = 'wall' | 'door' | 'window';
 

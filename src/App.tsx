@@ -123,7 +123,6 @@ function App() {
           mode={selectedTool === 'line' ? 'draw' : 'select'}
           onLineAdd={handleLineAdd}
           onLineEdit={handleLineEdit}
-          onLineDelete={handleLineDelete}
           onLineSelect={setSelectedLine}
           selectedLine={selectedLine}
         />
