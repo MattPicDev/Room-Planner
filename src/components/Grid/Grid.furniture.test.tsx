@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Grid } from './Grid';
 import type { GridConfig } from '../../types/grid';
 import type { FurnitureTemplate, FurnitureInstance } from '../../types/furniture';

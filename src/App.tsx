@@ -7,7 +7,6 @@ import type { Line, LineType } from './types/line';
 import type { FurnitureTemplate, FurnitureInstance } from './types/furniture';
 import { DEFAULT_GRID_CONFIG } from './types/grid';
 import type { GridConfig } from './types/grid';
-import { LINE_DEFAULTS } from './types/line';
 import { saveLines, loadLines, exportLayout, importLayout, saveFurnitureTemplates, loadFurnitureTemplates, saveFurniture, loadFurniture, saveGridScale, loadGridScale } from './utils/storage';
 import './App.css';
 
