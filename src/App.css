@@ -51,10 +51,11 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 15px;
   min-height: 0;
   min-width: 0;
+  overflow: hidden;
 }
 
 .selection-info {
