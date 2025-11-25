@@ -4,21 +4,24 @@ A visual room layout application built with React, TypeScript, and Vite. Design 
 
 ## Features
 
-### Current (v1.0)
+### Current (v1.1)
 - **Grid-based Canvas**: Graph paper style layout with configurable grid size
 - **Measurement System**: Set scale (inches per grid square) for real-world accuracy
-- **Line Drawing**: Draw walls, doors, and windows along grid lines with live length display
-- **Line Editing**: Select lines, drag endpoints to resize, translate entire lines, and delete lines
+- **Flexible Drawing Modes**: Toggle between grid-aligned (horizontal/vertical) and free-form (any angle) line drawing
+- **Smart Snapping System**: Lines intelligently snap to endpoints of existing lines or grid lines/intersections
+- **Line Drawing**: Draw walls, doors, and windows with live length display
+- **Line Editing**: Select lines, drag endpoints to resize, translate entire lines, edit length by typing, and delete lines
 - **Pan & Zoom**: Smooth viewport navigation with mouse wheel zoom and spacebar/middle-click panning
 - **Furniture Management**: Create custom furniture templates with dimensions in inches
 - **Furniture Editing**: Move and rotate furniture with drag-and-drop
 - **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
 - **Data Persistence**: Automatically saves layouts, furniture, and scale to local storage
 - **Import/Export**: Save and load complete layouts including measurements as JSON files
-- **Testing**: Comprehensive test suite with 77+ unit tests covering all features
+- **Testing**: Comprehensive test suite with 94 unit tests covering all features
 
 ### Planned Features
-- Diagonal and curved line drawing
+- Visual snap indicators when near endpoints or grid
+- Configurable snap distance in UI
 - Furniture collision prevention (detection helpers implemented)
 - Non-rectangular furniture shapes
 - Undo/redo functionality
@@ -67,16 +70,26 @@ npm run preview
 ### Drawing Lines
 1. Select **Draw Line** tool from the toolbar
 2. Choose line type: **Wall**, **Door**, or **Window**
-3. Click and drag on the canvas to draw lines that snap to the grid
-4. Lines are constrained to horizontal or vertical directions
-5. **Live measurement**: The current line length in inches appears in the toolbar
+3. **Toggle Drawing Mode**:
+   - **Grid Aligned** (checked): Lines snap to grid and are constrained to horizontal/vertical directions
+   - **Grid Aligned** (unchecked): Free-form drawing allows any angle with smart snapping
+4. Click and drag on the canvas to draw lines
+5. **Smart Snapping** (when not grid-aligned):
+   - Lines snap to endpoints of existing lines (within 2.5 pixels) - useful for creating connected layouts
+   - Lines snap to grid lines/intersections (within 2.5 pixels) - helpful for alignment
+   - Endpoint snapping takes priority over grid snapping
+6. **Live measurement**: The current line length in inches appears in the toolbar
 
 ### Editing Lines
 1. Select **Select** tool from the toolbar
 2. Click on any line to select it (highlighted in blue)
 3. **Resize**: Drag the endpoints (blue circles) to change the line length
 4. **Move**: Drag the line body (not the endpoints) to translate the entire line without changing its length
-5. **Length Display**: When a line is selected, its length appears in the "Selected" section of the toolbar
+5. **Edit Length**: 
+   - Click on the length display in the toolbar "Selected" section
+   - Type the desired length in inches and press Enter
+   - The line will scale from its start point to the new length
+   - Press Escape to cancel editing
 6. Click **Delete Line** button to remove the selected line
 7. Click elsewhere to deselect
 

@@ -86,6 +86,38 @@ function App() {
     setSelectedLine(null);
   };
 
+  const handleLineLengthChange = (newLength: number) => {
+    if (!selectedLine || newLength <= 0) return;
+    
+    // Calculate new end point based on desired length
+    const currentLength = Math.sqrt(
+      Math.pow(selectedLine.end.x - selectedLine.start.x, 2) +
+      Math.pow(selectedLine.end.y - selectedLine.start.y, 2)
+    );
+    
+    if (currentLength === 0) return;
+    
+    // Convert inches to pixels
+    const pixelsPerInch = gridConfig.cellSize / gridConfig.inchesPerCell;
+    const targetPixelLength = newLength * pixelsPerInch;
+    
+    // Scale the line from start point
+    const scale = targetPixelLength / currentLength;
+    const dx = selectedLine.end.x - selectedLine.start.x;
+    const dy = selectedLine.end.y - selectedLine.start.y;
+    
+    const newEnd = {
+      x: selectedLine.start.x + dx * scale,
+      y: selectedLine.start.y + dy * scale,
+    };
+    
+    handleLineEdit(selectedLine.id, { end: newEnd });
+  };
+
+  const handleGridAlignedModeChange = (enabled: boolean) => {
+    setGridConfig({ ...gridConfig, gridAlignedMode: enabled });
+  };
+
   const handleClear = () => {
     if (confirm('Reset will clear all lines and furniture, and allow you to set a new grid scale. Continue?')) {
       setLines([]);
@@ -205,8 +237,11 @@ function App() {
         onExport={handleExport}
         onImport={handleImport}
         currentLineLength={currentLineLength}
+        onLineLengthChange={handleLineLengthChange}
         gridScale={gridConfig.inchesPerCell}
         zoomLevel={zoomLevel}
+        gridAlignedMode={gridConfig.gridAlignedMode}
+        onGridAlignedModeChange={handleGridAlignedModeChange}
       />
 
       <main className="app-main">

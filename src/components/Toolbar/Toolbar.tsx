@@ -1,4 +1,5 @@
 import type { LineType } from '../../types/line';
+import { useState } from 'react';
 import './Toolbar.css';
 
 interface ToolbarProps {
@@ -10,8 +11,11 @@ interface ToolbarProps {
   onExport: () => void;
   onImport: (file: File) => void;
   currentLineLength?: number;
+  onLineLengthChange?: (length: number) => void;
   gridScale: number;
   zoomLevel: number;
+  gridAlignedMode: boolean;
+  onGridAlignedModeChange: (enabled: boolean) => void;
 }
 
 export function Toolbar({
@@ -23,13 +27,44 @@ export function Toolbar({
   onExport,
   onImport,
   currentLineLength,
+  onLineLengthChange,
   gridScale,
   zoomLevel,
+  gridAlignedMode,
+  onGridAlignedModeChange,
 }: ToolbarProps) {
+  const [lengthInput, setLengthInput] = useState('');
+  const [isEditingLength, setIsEditingLength] = useState(false);
+
   const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       onImport(file);
+    }
+  };
+
+  const handleLengthEdit = () => {
+    if (currentLineLength !== undefined) {
+      setLengthInput(currentLineLength.toFixed(1));
+      setIsEditingLength(true);
+    }
+  };
+
+  const handleLengthSubmit = () => {
+    const newLength = parseFloat(lengthInput);
+    if (!isNaN(newLength) && newLength > 0 && onLineLengthChange) {
+      onLineLengthChange(newLength);
+    }
+    setIsEditingLength(false);
+    setLengthInput('');
+  };
+
+  const handleLengthKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleLengthSubmit();
+    } else if (e.key === 'Escape') {
+      setIsEditingLength(false);
+      setLengthInput('');
     }
   };
 
@@ -93,6 +128,17 @@ export function Toolbar({
           >
             Window
           </button>
+          <div style={{ marginTop: '8px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={gridAlignedMode}
+                onChange={(e) => onGridAlignedModeChange(e.target.checked)}
+                style={{ marginRight: '6px' }}
+              />
+              Grid Aligned
+            </label>
+          </div>
         </div>
       )}
 
@@ -113,9 +159,31 @@ export function Toolbar({
       {currentLineLength !== undefined && (
         <div className="toolbar-section">
           <h3>Selected</h3>
-          <div className="scale-display">
-            Length: {currentLineLength.toFixed(1)}"
-          </div>
+          {isEditingLength ? (
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <input
+                type="number"
+                value={lengthInput}
+                onChange={(e) => setLengthInput(e.target.value)}
+                onKeyDown={handleLengthKeyDown}
+                onBlur={handleLengthSubmit}
+                autoFocus
+                step="0.1"
+                min="0"
+                style={{ width: '60px', padding: '2px 4px' }}
+              />
+              <span>"</span>
+            </div>
+          ) : (
+            <div 
+              className="scale-display" 
+              onClick={handleLengthEdit}
+              style={{ cursor: 'pointer', userSelect: 'none' }}
+              title="Click to edit length"
+            >
+              Length: {currentLineLength.toFixed(1)}"
+            </div>
+          )}
         </div>
       )}
     </div>

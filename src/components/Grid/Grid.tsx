@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import type { GridConfig } from '../../types/grid';
 import type { Line } from '../../types/line';
 import type { FurnitureInstance, FurnitureTemplate } from '../../types/furniture';
-import { snapToGrid, canvasToGrid, calculateLineLength } from '../../utils/gridHelpers';
+import { snapToGrid, canvasToGrid, calculateLineLength, smartSnap } from '../../utils/gridHelpers';
 import { findLineAtPoint, findEndpointAtPoint } from '../../utils/lineHelpers';
 import { isPointInFurniture } from '../../utils/collisionDetection';
 import './Grid.css';
@@ -355,7 +355,12 @@ export function Grid({
 
     // Convert to world coordinates
     const worldPoint = screenToWorld(screenX, screenY);
-    const snapped = snapToGrid(worldPoint, config.cellSize);
+    
+    // Use smart snapping based on grid configuration
+    const snapped = config.gridAlignedMode
+      ? snapToGrid(worldPoint, config.cellSize)
+      : smartSnap(worldPoint, lines, config.cellSize, config.snapToEndpoints, config.snapToGrid, config.snapDistance);
+    
     const gridPos = canvasToGrid(worldPoint, config.cellSize);
 
     if (mode === 'furniture') {
@@ -461,7 +466,12 @@ export function Grid({
 
     // Convert to world coordinates
     const worldPoint = screenToWorld(screenX, screenY);
-    const snapped = snapToGrid(worldPoint, config.cellSize);
+    
+    // Use smart snapping based on grid configuration
+    const snapped = config.gridAlignedMode
+      ? snapToGrid(worldPoint, config.cellSize)
+      : smartSnap(worldPoint, lines, config.cellSize, config.snapToEndpoints, config.snapToGrid, config.snapDistance);
+    
     const gridPos = canvasToGrid(worldPoint, config.cellSize);
 
     // Update preview position for furniture placement
@@ -527,29 +537,37 @@ export function Grid({
 
     // Handle dragging endpoint
     if (isDraggingEndpoint && selectedLine && startPoint && onLineEdit) {
-      // Constrain to horizontal or vertical
-      const dx = Math.abs(snapped.x - startPoint.x);
-      const dy = Math.abs(snapped.y - startPoint.y);
-      
-      const constrainedPoint = dx > dy
-        ? { x: snapped.x, y: startPoint.y }
-        : { x: startPoint.x, y: snapped.y };
-      
-      setCurrentPoint(constrainedPoint);
+      // Only constrain to horizontal/vertical in grid-aligned mode
+      if (config.gridAlignedMode) {
+        const dx = Math.abs(snapped.x - startPoint.x);
+        const dy = Math.abs(snapped.y - startPoint.y);
+        
+        const constrainedPoint = dx > dy
+          ? { x: snapped.x, y: startPoint.y }
+          : { x: startPoint.x, y: snapped.y };
+        
+        setCurrentPoint(constrainedPoint);
+      } else {
+        setCurrentPoint(snapped);
+      }
       return;
     }
 
     // Handle drawing new line
     if (isDrawing && mode === 'draw') {
       if (startPoint) {
-        // Constrain to horizontal or vertical
-        const dx = Math.abs(snapped.x - startPoint.x);
-        const dy = Math.abs(snapped.y - startPoint.y);
+        // Only constrain to horizontal/vertical in grid-aligned mode
+        if (config.gridAlignedMode) {
+          const dx = Math.abs(snapped.x - startPoint.x);
+          const dy = Math.abs(snapped.y - startPoint.y);
 
-        if (dx > dy) {
-          setCurrentPoint({ x: snapped.x, y: startPoint.y });
+          if (dx > dy) {
+            setCurrentPoint({ x: snapped.x, y: startPoint.y });
+          } else {
+            setCurrentPoint({ x: startPoint.x, y: snapped.y });
+          }
         } else {
-          setCurrentPoint({ x: startPoint.x, y: snapped.y });
+          setCurrentPoint(snapped);
         }
       }
     }

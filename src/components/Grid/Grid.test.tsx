@@ -11,6 +11,10 @@ const mockConfig: GridConfig = {
   inchesPerCell: 12,
   gridColor: '#ddd',
   backgroundColor: '#fff',
+  gridAlignedMode: true,
+  snapToEndpoints: true,
+  snapToGrid: true,
+  snapDistance: 2.5,
 };
 
 const mockTemplates: FurnitureTemplate[] = [
