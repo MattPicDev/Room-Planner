@@ -36,6 +36,21 @@ export function Toolbar({
   return (
     <div className="toolbar">
       <div className="toolbar-section">
+        <h3>Actions</h3>
+        <button onClick={onClear}>Reset</button>
+        <button onClick={onExport}>Export</button>
+        <label className="file-upload-button">
+          Import
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleFileImport}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+
+      <div className="toolbar-section">
         <h3>Tools</h3>
         <button
           className={selectedTool === 'line' ? 'active' : ''}
@@ -55,20 +70,6 @@ export function Toolbar({
         >
           Select
         </button>
-      </div>
-
-      <div className="toolbar-section">
-        <h3>Grid Scale</h3>
-        <div className="scale-display">
-          {gridScale}" per square
-        </div>
-      </div>
-
-      <div className="toolbar-section">
-        <h3>View</h3>
-        <div className="scale-display">
-          Zoom: {(zoomLevel * 100).toFixed(0)}%
-        </div>
       </div>
 
       {selectedTool === 'line' && (
@@ -92,28 +93,31 @@ export function Toolbar({
           >
             Window
           </button>
-          {currentLineLength !== undefined && (
-            <div className="line-length-display">
-              Length: {currentLineLength.toFixed(1)}"
-            </div>
-          )}
         </div>
       )}
 
       <div className="toolbar-section">
-        <h3>Actions</h3>
-        <button onClick={onClear}>Reset</button>
-        <button onClick={onExport}>Export</button>
-        <label className="file-upload-button">
-          Import
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleFileImport}
-            style={{ display: 'none' }}
-          />
-        </label>
+        <h3>Grid Scale</h3>
+        <div className="scale-display">
+          {gridScale}" per square
+        </div>
       </div>
+
+      <div className="toolbar-section">
+        <h3>View</h3>
+        <div className="scale-display">
+          Zoom: {(zoomLevel * 100).toFixed(0)}%
+        </div>
+      </div>
+
+      {currentLineLength !== undefined && (
+        <div className="toolbar-section">
+          <h3>Selected</h3>
+          <div className="scale-display">
+            Length: {currentLineLength.toFixed(1)}"
+          </div>
+        </div>
+      )}
     </div>
   );
 }

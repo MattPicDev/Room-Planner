@@ -74,7 +74,7 @@ export function Grid({
     } else if (onCurrentLineLengthChange) {
       onCurrentLineLengthChange(undefined);
     }
-  }, [isDrawing, isDraggingEndpoint, isDraggingLine, startPoint, currentPoint, selectedLine, config.cellSize, config.inchesPerCell, onCurrentLineLengthChange]);
+  }, [isDrawing, isDraggingEndpoint, isDraggingLine, startPoint, currentPoint, selectedLine, config.cellSize, config.inchesPerCell]);
 
   // Notify parent of zoom level changes
   useEffect(() => {
