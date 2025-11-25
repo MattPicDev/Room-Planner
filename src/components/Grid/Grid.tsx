@@ -133,7 +133,6 @@ export function Grid({
     ctx.scale(zoomLevel, zoomLevel);
 
     // Draw grid lines
-    ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1 / zoomLevel; // Keep grid lines same visual thickness
 
     // Calculate visible grid range (accounting for zoom and pan)
@@ -142,8 +141,15 @@ export function Grid({
     const startY = Math.floor((-viewOffset.y / zoomLevel) / cellSize) * cellSize;
     const endY = Math.ceil((height / zoomLevel - viewOffset.y / zoomLevel) / cellSize) * cellSize;
 
+    // Helper to get darker shade for emphasis lines
+    const getGridLineColor = (position: number, cellSize: number): string => {
+      const gridIndex = Math.round(position / cellSize);
+      return gridIndex % 4 === 0 ? '#c0c0c0' : gridColor; // Slightly darker every 4th line
+    };
+
     // Vertical lines
     for (let x = startX; x <= endX; x += cellSize) {
+      ctx.strokeStyle = getGridLineColor(x, cellSize);
       ctx.beginPath();
       ctx.moveTo(x, startY);
       ctx.lineTo(x, endY);
@@ -152,6 +158,7 @@ export function Grid({
 
     // Horizontal lines
     for (let y = startY; y <= endY; y += cellSize) {
+      ctx.strokeStyle = getGridLineColor(y, cellSize);
       ctx.beginPath();
       ctx.moveTo(startX, y);
       ctx.lineTo(endX, y);
