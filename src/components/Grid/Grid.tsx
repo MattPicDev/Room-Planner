@@ -532,10 +532,17 @@ export function Grid({
       const basePos = config.gridAlignedMode 
         ? gridPos 
         : { x: worldPoint.x / config.cellSize, y: worldPoint.y / config.cellSize };
-      const newPos = {
+      let newPos = {
         x: basePos.x - dragOffset.x,
         y: basePos.y - dragOffset.y,
       };
+      // Round to nearest grid cell when snap is enabled to realign fractional positions
+      if (config.gridAlignedMode) {
+        newPos = {
+          x: Math.round(newPos.x),
+          y: Math.round(newPos.y),
+        };
+      }
       onFurnitureMove(selectedFurniture.id, newPos);
       return;
     }
