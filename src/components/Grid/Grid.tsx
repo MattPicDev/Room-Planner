@@ -264,10 +264,53 @@ export function Grid({
         ctx.arc(endPos.x, endPos.y, 6 / zoomLevel, 0, 2 * Math.PI);
         ctx.fill();
       }
+
+      // Draw dimension label if enabled
+      if (config.showLineDimensions) {
+        // Calculate line length in inches
+        const dx = line.end.x - line.start.x;
+        const dy = line.end.y - line.start.y;
+        const lengthInPixels = Math.sqrt(dx * dx + dy * dy);
+        const pixelsPerInch = config.cellSize / config.inchesPerCell;
+        const lengthInInches = Math.round(lengthInPixels / pixelsPerInch);
+
+        // Calculate midpoint
+        const midX = (line.start.x + line.end.x) / 2;
+        const midY = (line.start.y + line.end.y) / 2;
+
+        // Determine label offset based on line orientation
+        const angle = Math.atan2(dy, dx);
+        const isVertical = Math.abs(Math.cos(angle)) < 0.3;
+        const offsetDistance = 15 / zoomLevel;
+
+        let labelX, labelY;
+        if (isVertical) {
+          // For vertical lines, place label to the right
+          labelX = midX + offsetDistance;
+          labelY = midY;
+        } else {
+          // For horizontal/diagonal lines, place label above
+          labelX = midX;
+          labelY = midY - offsetDistance;
+        }
+
+        // Draw label
+        ctx.save();
+        ctx.translate(labelX, labelY);
+        ctx.scale(1 / zoomLevel, 1 / zoomLevel);
+        
+        ctx.font = '14px Arial';
+        ctx.fillStyle = line.color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${lengthInInches}"`, 0, 0);
+        
+        ctx.restore();
+      }
     });
 
     ctx.restore();
-  }, [lines, selectedLine, viewOffset, zoomLevel, isDraggingEndpoint, startPoint, currentPoint]);
+  }, [lines, selectedLine, viewOffset, zoomLevel, isDraggingEndpoint, isDraggingLine, startPoint, currentPoint, config]);
 
   // Draw furniture
   const drawFurniture = useCallback((ctx: CanvasRenderingContext2D) => {

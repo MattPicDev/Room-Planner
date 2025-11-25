@@ -117,6 +117,10 @@ function App() {
     setGridConfig({ ...gridConfig, gridAlignedMode: enabled });
   };
 
+  const handleShowLineDimensionsChange = (show: boolean) => {
+    setGridConfig({ ...gridConfig, showLineDimensions: show });
+  };
+
   const handleClear = () => {
     if (confirm('Reset will clear all lines and furniture, and allow you to set a new grid scale. Continue?')) {
       setLines([]);
@@ -245,6 +249,8 @@ function App() {
         zoomLevel={zoomLevel}
         gridAlignedMode={gridConfig.gridAlignedMode}
         onGridAlignedModeChange={handleGridAlignedModeChange}
+        showLineDimensions={gridConfig.showLineDimensions}
+        onShowLineDimensionsChange={handleShowLineDimensionsChange}
       />
 
       <main className="app-main">

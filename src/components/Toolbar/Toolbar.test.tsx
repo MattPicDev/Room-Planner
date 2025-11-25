@@ -15,6 +15,8 @@ describe('Toolbar', () => {
     zoomLevel: 1.0,
     gridAlignedMode: true,
     onGridAlignedModeChange: vi.fn(),
+    showLineDimensions: false,
+    onShowLineDimensionsChange: vi.fn(),
   };
 
   it('renders all action buttons', () => {
@@ -269,6 +271,48 @@ describe('Toolbar', () => {
         fireEvent.change(input, { target: { files: [] } });
         expect(onImport).not.toHaveBeenCalled();
       }
+    });
+  });
+
+  describe('Show Dimensions checkbox', () => {
+    it('renders show dimensions checkbox', () => {
+      render(<Toolbar {...defaultProps} />);
+      
+      expect(screen.getByText('Show Dimensions')).toBeInTheDocument();
+      const checkbox = screen.getByRole('checkbox', { name: /show dimensions/i });
+      expect(checkbox).toBeInTheDocument();
+    });
+
+    it('reflects showLineDimensions state in checkbox', () => {
+      const { rerender } = render(<Toolbar {...defaultProps} showLineDimensions={false} />);
+      
+      let checkbox = screen.getByRole('checkbox', { name: /show dimensions/i });
+      expect(checkbox).not.toBeChecked();
+      
+      rerender(<Toolbar {...defaultProps} showLineDimensions={true} />);
+      
+      checkbox = screen.getByRole('checkbox', { name: /show dimensions/i });
+      expect(checkbox).toBeChecked();
+    });
+
+    it('calls onShowLineDimensionsChange when checkbox is toggled', () => {
+      const onShowLineDimensionsChange = vi.fn();
+      render(<Toolbar {...defaultProps} showLineDimensions={false} onShowLineDimensionsChange={onShowLineDimensionsChange} />);
+      
+      const checkbox = screen.getByRole('checkbox', { name: /show dimensions/i });
+      fireEvent.click(checkbox);
+      
+      expect(onShowLineDimensionsChange).toHaveBeenCalledWith(true);
+    });
+
+    it('calls onShowLineDimensionsChange with false when unchecked', () => {
+      const onShowLineDimensionsChange = vi.fn();
+      render(<Toolbar {...defaultProps} showLineDimensions={true} onShowLineDimensionsChange={onShowLineDimensionsChange} />);
+      
+      const checkbox = screen.getByRole('checkbox', { name: /show dimensions/i });
+      fireEvent.click(checkbox);
+      
+      expect(onShowLineDimensionsChange).toHaveBeenCalledWith(false);
     });
   });
 });

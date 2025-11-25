@@ -15,6 +15,7 @@ const mockConfig: GridConfig = {
   snapToEndpoints: true,
   snapToGrid: true,
   snapDistance: 2.5,
+  showLineDimensions: false,
 };
 
 const mockTemplates: FurnitureTemplate[] = [
@@ -354,6 +355,99 @@ describe('Grid Pan/Zoom', () => {
 
     // The viewport should adjust to keep the cursor position stable
     // (This is tested by ensuring the function completes without errors)
+  });
+});
+
+describe('Grid Line Dimensions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should render canvas when showLineDimensions is enabled', () => {
+    const configWithDimensions = { ...mockConfig, showLineDimensions: true };
+    
+    render(
+      <Grid
+        config={configWithDimensions}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+      />
+    );
+
+    const canvas = document.querySelector('canvas');
+    expect(canvas).toBeTruthy();
+  });
+
+  it('should render canvas when showLineDimensions is disabled', () => {
+    const configWithoutDimensions = { ...mockConfig, showLineDimensions: false };
+    
+    render(
+      <Grid
+        config={configWithoutDimensions}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+      />
+    );
+
+    const canvas = document.querySelector('canvas');
+    expect(canvas).toBeTruthy();
+  });
+
+  it('should accept showLineDimensions config property', () => {
+    const configWithDimensions = { ...mockConfig, showLineDimensions: true };
+    
+    const { rerender } = render(
+      <Grid
+        config={configWithDimensions}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+      />
+    );
+
+    // Re-render with showLineDimensions disabled
+    const configWithoutDimensions = { ...mockConfig, showLineDimensions: false };
+    rerender(
+      <Grid
+        config={configWithoutDimensions}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+      />
+    );
+
+    const canvas = document.querySelector('canvas');
+    expect(canvas).toBeTruthy();
   });
 });
 

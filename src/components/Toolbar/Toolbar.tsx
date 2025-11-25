@@ -16,6 +16,8 @@ interface ToolbarProps {
   zoomLevel: number;
   gridAlignedMode: boolean;
   onGridAlignedModeChange: (enabled: boolean) => void;
+  showLineDimensions: boolean;
+  onShowLineDimensionsChange: (show: boolean) => void;
 }
 
 export function Toolbar({
@@ -32,6 +34,8 @@ export function Toolbar({
   zoomLevel,
   gridAlignedMode,
   onGridAlignedModeChange,
+  showLineDimensions,
+  onShowLineDimensionsChange,
 }: ToolbarProps) {
   const [lengthInput, setLengthInput] = useState('');
   const [isEditingLength, setIsEditingLength] = useState(false);
@@ -146,6 +150,17 @@ export function Toolbar({
         <h3>Grid Scale</h3>
         <div className="scale-display">
           {gridScale}" per square
+        </div>
+        <div style={{ marginTop: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={showLineDimensions}
+              onChange={(e) => onShowLineDimensionsChange(e.target.checked)}
+              style={{ marginRight: '6px' }}
+            />
+            Show Dimensions
+          </label>
         </div>
       </div>
 

@@ -18,7 +18,7 @@ The project began with a `.plan` file that outlined the vision and feature requi
 
 ### Key Highlights
 
-- **Complete test coverage**: 193 passing tests including unit and component tests
+- **Complete test coverage**: 200 passing tests including unit and component tests
 - **CI/CD pipeline**: GitHub Actions workflow for automated testing on Node.js 18.x and 20.x
 - **Production-ready code**: Type-safe TypeScript, proper state management, and error handling
 - **User-focused design**: Interactive UI with real-time feedback and auto-save functionality
@@ -38,6 +38,7 @@ This project demonstrates AI's capability to:
 - **Flexible Drawing Modes**: Toggle between grid-aligned (horizontal/vertical) and free-form (any angle) line drawing
 - **Smart Snapping System**: Lines intelligently snap to endpoints of existing lines or grid lines/intersections
 - **Line Drawing**: Draw walls, doors, and windows with live length display
+- **Line Dimension Labels**: Optional display of length measurements on all lines (toggle with checkbox)
 - **Line Editing**: Select lines, drag endpoints to resize, translate entire lines, edit length by typing, and delete lines
 - **Pan & Zoom**: Smooth viewport navigation with mouse wheel zoom and spacebar/middle-click panning
 - **Furniture Management**: Create custom furniture templates with dimensions in inches
@@ -45,7 +46,7 @@ This project demonstrates AI's capability to:
 - **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
 - **Data Persistence**: Automatically saves layouts, lines, furniture instances, and scale to local storage
 - **Import/Export**: Save and load complete layouts including measurements, lines, and furniture as JSON files
-- **Testing**: Comprehensive test suite with 97 unit tests covering all features
+- **Testing**: Comprehensive test suite with 200 tests covering all features
 
 ### Planned Features
 - Visual snap indicators when near endpoints or grid
@@ -106,7 +107,11 @@ npm run preview
    - Lines snap to endpoints of existing lines (within 2.5 pixels) - useful for creating connected layouts
    - Lines snap to grid lines/intersections (within 2.5 pixels) - helpful for alignment
    - Endpoint snapping takes priority over grid snapping
-6. **Live measurement**: The current line length in inches appears in the toolbar
+6. **Show Dimensions** checkbox (in Grid Scale section):
+   - **Checked**: All lines display their length in inches as text labels on the canvas
+   - Labels match line colors and are positioned above horizontal lines or to the right of vertical lines
+   - Labels remain readable at all zoom levels
+7. **Live measurement**: The current line length in inches appears in the toolbar
 
 ### Editing Lines
 1. Select **Select** tool from the toolbar
