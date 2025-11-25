@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { distanceToLine, findLineAtPoint, findEndpointAtPoint } from './lineHelpers';
+import { distanceToLine, findLineAtPoint, findEndpointAtPoint, doLinesIntersect, checkLineIntersection } from './lineHelpers';
 import type { Line } from '../types/line';
 
 describe('lineHelpers', () => {
@@ -119,6 +119,218 @@ describe('lineHelpers', () => {
       const point = { x: 5, y: 0 };
       const result = findEndpointAtPoint(point, shortLine, 10);
       expect(result).toBe('start');
+    });
+  });
+
+  describe('doLinesIntersect', () => {
+    it('detects intersection of perpendicular lines', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 5 },
+        end: { x: 10, y: 5 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 5, y: 0 },
+        end: { x: 5, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(true);
+    });
+
+    it('detects no intersection when lines do not cross', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 5, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 10, y: 0 },
+        end: { x: 15, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(false);
+    });
+
+    it('detects intersection at line endpoints', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 10, y: 0 },
+        end: { x: 10, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(true);
+    });
+
+    it('handles parallel non-overlapping lines', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 0, y: 5 },
+        end: { x: 10, y: 5 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(false);
+    });
+
+    it('detects overlapping parallel lines', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 5, y: 0 },
+        end: { x: 15, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(true);
+    });
+
+    it('detects diagonal line intersections', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 0, y: 10 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(true);
+    });
+
+    it('handles lines that would intersect if extended but do not', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 5, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 10, y: -5 },
+        end: { x: 10, y: 5 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(false);
+    });
+  });
+
+  describe('checkLineIntersection', () => {
+    const existingLines: Line[] = [
+      {
+        id: '1',
+        start: { x: 0, y: 5 },
+        end: { x: 10, y: 5 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      },
+      {
+        id: '2',
+        start: { x: 15, y: 0 },
+        end: { x: 15, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      },
+    ];
+
+    it('detects intersection with existing lines', () => {
+      const newLine: Line = {
+        id: '3',
+        start: { x: 5, y: 0 },
+        end: { x: 5, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(checkLineIntersection(newLine, existingLines)).toBe(true);
+    });
+
+    it('returns false when no intersection', () => {
+      const newLine: Line = {
+        id: '3',
+        start: { x: 20, y: 0 },
+        end: { x: 20, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(checkLineIntersection(newLine, existingLines)).toBe(false);
+    });
+
+    it('returns false when line list is empty', () => {
+      const newLine: Line = {
+        id: '3',
+        start: { x: 5, y: 0 },
+        end: { x: 5, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(checkLineIntersection(newLine, [])).toBe(false);
+    });
+
+    it('detects intersection with multiple lines', () => {
+      const newLine: Line = {
+        id: '3',
+        start: { x: -5, y: 5 },
+        end: { x: 20, y: 5 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      // This line intersects both existing lines
+      expect(checkLineIntersection(newLine, existingLines)).toBe(true);
     });
   });
 });

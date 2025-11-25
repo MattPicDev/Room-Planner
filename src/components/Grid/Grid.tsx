@@ -3,7 +3,7 @@ import type { GridConfig } from '../../types/grid';
 import type { Line } from '../../types/line';
 import type { FurnitureInstance, FurnitureTemplate } from '../../types/furniture';
 import { snapToGrid, canvasToGrid, calculateLineLength, smartSnap } from '../../utils/gridHelpers';
-import { findLineAtPoint, findEndpointAtPoint } from '../../utils/lineHelpers';
+import { findLineAtPoint, findEndpointAtPoint, checkLineIntersection } from '../../utils/lineHelpers';
 import { isPointInFurniture } from '../../utils/collisionDetection';
 import './Grid.css';
 
@@ -638,7 +638,14 @@ export function Grid({
           thickness: 4,
           color: '#000000',
         };
-        onLineAdd(newLine);
+        
+        // Check if the new line intersects with any existing lines
+        if (checkLineIntersection(newLine, lines)) {
+          // Don't add the line if it intersects
+          console.warn('Cannot add line: intersects with existing line');
+        } else {
+          onLineAdd(newLine);
+        }
       }
     }
 
