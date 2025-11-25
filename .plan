@@ -28,7 +28,7 @@ A visual room layout application that allows users to design room layouts on a g
 - [x] Line properties: thickness, color, type
 - [x] Select mode with visual feedback
 - [x] Real-time line length display in inches
-- [ ] Validation: prevent overlapping lines
+- [x] Validation: prevent overlapping lines
 
 **Note**: Future version will support diagonal/free-form lines
 
@@ -59,7 +59,7 @@ A visual room layout application that allows users to design room layouts on a g
 - [x] Test coverage for line helpers
 - [x] Test coverage for collision detection (with scale support)
 - [x] Test coverage for storage (including grid scale)
-- [ ] Component tests for React components
+- [x] Component tests for React components
 - [ ] Integration tests for user workflows
 
 ## Phase 2: Future Enhancements
@@ -153,5 +153,5 @@ src/
 - ✅ User can define and place furniture with accurate dimensions
 - ✅ User can set and persist grid scale for measurement accuracy
 - ✅ Layout persists across browser sessions
-- ✅ All core features have test coverage >80% (69 tests passing)
+- ✅ All core features have test coverage >80% (190 tests passing)
 - ✅ Documentation is complete and accurate
