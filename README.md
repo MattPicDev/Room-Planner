@@ -99,27 +99,29 @@ npm run preview
 ### Drawing Lines
 1. Select **Draw Line** tool from the toolbar
 2. Choose line type: **Wall**, **Door**, or **Window**
-3. **Snap to Grid** checkbox (in Tools section, always visible):
-   - **Checked**: Lines snap to grid and are constrained to horizontal/vertical directions
-   - **Unchecked**: Free-form drawing allows any angle with smart snapping
-4. Click and drag on the canvas to draw lines
-5. **Smart Snapping** (when snap to grid is unchecked):
+3. Click and drag on the canvas to draw lines
+4. **Smart Snapping** (when snap to grid is unchecked):
    - Lines snap to endpoints of existing lines (within 2.5 pixels) - useful for creating connected layouts
    - Lines snap to grid lines/intersections (within 2.5 pixels) - helpful for alignment
    - Endpoint snapping takes priority over grid snapping
-6. **Show Dimensions** checkbox (in Grid Scale section):
-   - **Checked**: All lines display their length in inches as text labels on the canvas
-   - Labels match line colors and are positioned above horizontal lines or to the right of vertical lines
-   - Labels remain readable at all zoom levels
-7. **Live measurement**: The current line length in inches appears in the toolbar
+5. **Live measurement**: The current line length in inches appears in the toolbar
+
+**Grid Controls** (Grid section):
+- **Snap to Grid** checkbox:
+  - **Checked**: Lines snap to grid and are constrained to horizontal/vertical directions
+  - **Unchecked**: Free-form drawing allows any angle with smart snapping
+
+**View Options** (View section):
+- **Show Dimensions** checkbox:
+  - **Checked**: All lines display their length in inches as text labels on the canvas
+  - Labels match line colors and are positioned above horizontal lines or to the right of vertical lines
+  - Labels remain readable at all zoom levels
 
 ### Editing Lines
 1. Select **Select** tool from the toolbar
 2. Click on any line to select it (highlighted in blue)
 3. **Resize**: Drag the endpoints (blue circles) to change the line length
-   - **Snap to Grid** checkbox affects endpoint dragging behavior
 4. **Move**: Drag the line body (not the endpoints) to translate the entire line without changing its length
-   - **Snap to Grid** checkbox affects line movement
 5. **Edit Length**: 
    - Click on the length display in the toolbar "Selected" section
    - Type the desired length in inches and press Enter
@@ -127,6 +129,8 @@ npm run preview
    - Press Escape to cancel editing
 6. Click **Delete Line** button to remove the selected line
 7. Click elsewhere to deselect
+
+**Note**: The **Snap to Grid** checkbox (in Grid section) affects line editing - checked = snap to grid, unchecked = free positioning.
 
 ### Managing Furniture
 1. Click **Furniture** tool to open the furniture library
@@ -137,11 +141,11 @@ npm run preview
    - Optionally add a category
 3. Click on a template to select it for placement
 4. Click on the grid to place furniture
-   - **Snap to Grid** checkbox controls placement: checked = grid-aligned, unchecked = free placement
 5. Use **Select** tool to move furniture by dragging
-   - **Snap to Grid** checkbox affects furniture movement
 6. With furniture selected, use **Rotate 90°** to rotate
 7. Click **Delete** to remove furniture from the room
+
+**Note**: The **Snap to Grid** checkbox (in Grid section) controls furniture placement and movement - checked = grid-aligned, unchecked = free placement.
 
 ### Saving and Loading
 - Layouts are automatically saved to browser local storage

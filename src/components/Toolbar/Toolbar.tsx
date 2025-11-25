@@ -109,17 +109,6 @@ export function Toolbar({
         >
           Select
         </button>
-        <div style={{ marginTop: '8px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
-            <input
-              type="checkbox"
-              checked={gridAlignedMode}
-              onChange={(e) => onGridAlignedModeChange(e.target.checked)}
-              style={{ marginRight: '6px' }}
-            />
-            Snap to Grid
-          </label>
-        </div>
       </div>
 
       {selectedTool === 'line' && (
@@ -147,9 +136,27 @@ export function Toolbar({
       )}
 
       <div className="toolbar-section">
-        <h3>Grid Scale</h3>
+        <h3>Grid</h3>
         <div className="scale-display">
           {gridScale}" per square
+        </div>
+        <div style={{ marginTop: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={gridAlignedMode}
+              onChange={(e) => onGridAlignedModeChange(e.target.checked)}
+              style={{ marginRight: '6px' }}
+            />
+            Snap to Grid
+          </label>
+        </div>
+      </div>
+
+      <div className="toolbar-section">
+        <h3>View</h3>
+        <div className="scale-display">
+          Zoom: {(zoomLevel * 100).toFixed(0)}%
         </div>
         <div style={{ marginTop: '8px' }}>
           <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
@@ -161,13 +168,6 @@ export function Toolbar({
             />
             Show Dimensions
           </label>
-        </div>
-      </div>
-
-      <div className="toolbar-section">
-        <h3>View</h3>
-        <div className="scale-display">
-          Zoom: {(zoomLevel * 100).toFixed(0)}%
         </div>
       </div>
 
