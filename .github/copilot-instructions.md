@@ -32,3 +32,5 @@ Visual room layout application built with TypeScript, React, and Vite for intera
 - [x] Free-form line drawing (non-grid-aligned)
 - [x] Smart snapping system (endpoints, grid)
 - [x] Interactive line length editing in toolbar
+- [x] Furniture instance persistence (save/load/export/import)
+- [x] TypeScript type compliance in tests

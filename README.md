@@ -15,9 +15,9 @@ A visual room layout application built with React, TypeScript, and Vite. Design 
 - **Furniture Management**: Create custom furniture templates with dimensions in inches
 - **Furniture Editing**: Move and rotate furniture with drag-and-drop
 - **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
-- **Data Persistence**: Automatically saves layouts, furniture, and scale to local storage
-- **Import/Export**: Save and load complete layouts including measurements as JSON files
-- **Testing**: Comprehensive test suite with 94 unit tests covering all features
+- **Data Persistence**: Automatically saves layouts, lines, furniture instances, and scale to local storage
+- **Import/Export**: Save and load complete layouts including measurements, lines, and furniture as JSON files
+- **Testing**: Comprehensive test suite with 97 unit tests covering all features
 
 ### Planned Features
 - Visual snap indicators when near endpoints or grid

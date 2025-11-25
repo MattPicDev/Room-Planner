@@ -12,7 +12,7 @@ import {
   snapToGridIfClose,
   smartSnap
 } from './gridHelpers';
-import type { Line } from '../types/grid';
+import type { Line } from '../types/line';
 
 describe('gridHelpers', () => {
   describe('snapToGrid', () => {
@@ -177,7 +177,7 @@ describe('gridHelpers', () => {
 
     it('should return null when no endpoints are within snapDistance', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 0, y: 0 }, end: { x: 10, y: 10 } },
+        { id: '1', start: { x: 0, y: 0 }, end: { x: 10, y: 10 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = findNearestEndpoint({ x: 100, y: 100 }, lines, 5);
       expect(result).toBeNull();
@@ -185,7 +185,7 @@ describe('gridHelpers', () => {
 
     it('should return the nearest start point within snapDistance', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 } },
+        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = findNearestEndpoint({ x: 102, y: 103 }, lines, 5);
       expect(result).toEqual({ x: 100, y: 100 });
@@ -193,7 +193,7 @@ describe('gridHelpers', () => {
 
     it('should return the nearest end point within snapDistance', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 } },
+        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = findNearestEndpoint({ x: 198, y: 201 }, lines, 5);
       expect(result).toEqual({ x: 200, y: 200 });
@@ -201,8 +201,8 @@ describe('gridHelpers', () => {
 
     it('should return the closest endpoint from multiple lines', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 } },
-        { id: '2', start: { x: 150, y: 150 }, end: { x: 250, y: 250 } },
+        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
+        { id: '2', start: { x: 150, y: 150 }, end: { x: 250, y: 250 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = findNearestEndpoint({ x: 152, y: 151 }, lines, 5);
       expect(result).toEqual({ x: 150, y: 150 });
@@ -210,7 +210,7 @@ describe('gridHelpers', () => {
 
     it('should respect the snapDistance parameter', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 } },
+        { id: '1', start: { x: 100, y: 100 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = findNearestEndpoint({ x: 110, y: 110 }, lines, 5);
       expect(result).toBeNull();
@@ -253,7 +253,7 @@ describe('gridHelpers', () => {
   describe('smartSnap', () => {
     it('should prioritize endpoint snapping over grid snapping', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 102, y: 98 }, end: { x: 200, y: 200 } },
+        { id: '1', start: { x: 102, y: 98 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = smartSnap({ x: 100, y: 100 }, lines, 20, true, true, 5);
       expect(result).toEqual({ x: 102, y: 98 });
@@ -261,7 +261,7 @@ describe('gridHelpers', () => {
 
     it('should snap to grid when no endpoints are close', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 200, y: 200 }, end: { x: 300, y: 300 } },
+        { id: '1', start: { x: 200, y: 200 }, end: { x: 300, y: 300 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = smartSnap({ x: 101, y: 99 }, lines, 20, true, true, 5);
       expect(result).toEqual({ x: 100, y: 100 });
@@ -269,7 +269,7 @@ describe('gridHelpers', () => {
 
     it('should return raw point when endpoint snapping is disabled', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 102, y: 98 }, end: { x: 200, y: 200 } },
+        { id: '1', start: { x: 102, y: 98 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = smartSnap({ x: 100, y: 100 }, lines, 20, false, true, 5);
       expect(result).toEqual({ x: 100, y: 100 }); // Snaps to grid instead
@@ -277,7 +277,7 @@ describe('gridHelpers', () => {
 
     it('should return raw point when grid snapping is disabled and no endpoints close', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 200, y: 200 }, end: { x: 300, y: 300 } },
+        { id: '1', start: { x: 200, y: 200 }, end: { x: 300, y: 300 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = smartSnap({ x: 101, y: 99 }, lines, 20, true, false, 5);
       expect(result).toEqual({ x: 101, y: 99 });
@@ -285,7 +285,7 @@ describe('gridHelpers', () => {
 
     it('should return raw point when both snapping modes are disabled', () => {
       const lines: Line[] = [
-        { id: '1', start: { x: 102, y: 98 }, end: { x: 200, y: 200 } },
+        { id: '1', start: { x: 102, y: 98 }, end: { x: 200, y: 200 }, type: 'wall', thickness: 4, color: '#000000' },
       ];
       const result = smartSnap({ x: 100, y: 100 }, lines, 20, false, false, 5);
       expect(result).toEqual({ x: 100, y: 100 });
