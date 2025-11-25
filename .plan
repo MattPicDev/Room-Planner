@@ -64,17 +64,44 @@ A visual room layout application that allows users to design room layouts on a g
 
 ## Phase 2: Future Enhancements
 
-### Planned Features
-- Diagonal and curved line drawing
-- Non-rectangular furniture shapes
-- User authentication and cloud storage
-- Multiple room layouts per user
-- Measurement tools (distance, area)
-- Export to image/PDF
-- Furniture search and filtering
-- Undo/redo functionality
-- Keyboard shortcuts
-- Touch screen support
+### User Experience Improvements
+- [ ] Visual snap indicators when near endpoints or grid
+- [ ] Configurable snap distance in UI settings
+- [ ] Undo/redo functionality with history management
+- [ ] Keyboard shortcuts for common actions
+- [ ] Multi-select and bulk operations (move, delete, copy)
+- [ ] Touch screen support for mobile devices
+
+### Drawing Enhancements
+- [ ] Diagonal and curved line drawing
+- [ ] Arc/circle drawing tools
+- [ ] Line style variations (dashed, dotted)
+- [ ] Dimension annotations and callouts
+
+### Furniture Features
+- [ ] Non-rectangular furniture shapes (L-shaped, curved)
+- [ ] Furniture collision prevention (detection helpers already implemented)
+- [ ] Furniture library with pre-defined templates
+- [ ] Furniture search and filtering by category
+- [ ] Custom furniture colors and textures
+
+### Export and Sharing
+- [ ] Export to image (PNG, JPG)
+- [ ] Export to PDF with measurements
+- [ ] Print layout functionality
+- [ ] Share layouts via URL
+
+### Data Management
+- [ ] User authentication and cloud storage
+- [ ] Multiple room layouts per user
+- [ ] Layout versioning and history
+- [ ] Template sharing between users
+
+### Measurement Tools
+- [ ] Distance measurement tool
+- [ ] Area calculation tool
+- [ ] Perimeter calculation
+- [ ] Scale ruler overlay
 
 ## Development Workflow
 
