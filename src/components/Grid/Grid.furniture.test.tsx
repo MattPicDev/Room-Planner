@@ -15,6 +15,7 @@ const createMockConfig = (gridAlignedMode: boolean): GridConfig => ({
   snapToEndpoints: true,
   snapToGrid: true,
   snapDistance: 2.5,
+  showLineDimensions: false,
 });
 
 const mockTemplate: FurnitureTemplate = {
