@@ -8,7 +8,7 @@ import type { FurnitureTemplate, FurnitureInstance } from './types/furniture';
 import { DEFAULT_GRID_CONFIG } from './types/grid';
 import type { GridConfig } from './types/grid';
 import { LINE_DEFAULTS } from './types/line';
-import { saveLines, loadLines, exportLayout, importLayout, saveFurnitureTemplates, loadFurnitureTemplates, saveGridScale, loadGridScale } from './utils/storage';
+import { saveLines, loadLines, exportLayout, importLayout, saveFurnitureTemplates, loadFurnitureTemplates, saveFurniture, loadFurniture, saveGridScale, loadGridScale } from './utils/storage';
 import './App.css';
 
 function App() {
@@ -44,6 +44,8 @@ function App() {
     setLines(savedLines);
     const savedTemplates = loadFurnitureTemplates();
     setFurnitureTemplates(savedTemplates);
+    const savedFurniture = loadFurniture();
+    setFurniture(savedFurniture);
     
     const savedScale = loadGridScale();
     if (savedScale !== null) {
@@ -62,6 +64,11 @@ function App() {
   useEffect(() => {
     saveFurnitureTemplates(furnitureTemplates);
   }, [furnitureTemplates]);
+
+  // Save furniture instances whenever they change
+  useEffect(() => {
+    saveFurniture(furniture);
+  }, [furniture]);
 
   const handleLineAdd = (line: Line) => {
     // Apply current line type settings
@@ -194,6 +201,10 @@ function App() {
       if (importLayout(content)) {
         const importedLines = loadLines();
         setLines(importedLines);
+        const importedTemplates = loadFurnitureTemplates();
+        setFurnitureTemplates(importedTemplates);
+        const importedFurniture = loadFurniture();
+        setFurniture(importedFurniture);
         const importedScale = loadGridScale();
         if (importedScale !== null) {
           setGridConfig({ ...DEFAULT_GRID_CONFIG, inchesPerCell: importedScale });

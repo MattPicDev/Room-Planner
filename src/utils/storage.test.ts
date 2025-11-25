@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { FurnitureTemplate } from '../types/furniture';
+import type { FurnitureTemplate, FurnitureInstance } from '../types/furniture';
 import type { Line } from '../types/line';
 import { 
   saveFurnitureTemplates, 
   loadFurnitureTemplates, 
+  saveFurniture,
+  loadFurniture,
   saveLines, 
   loadLines,
   saveGridScale,
@@ -52,6 +54,41 @@ describe('storage', () => {
     it('should handle invalid JSON gracefully', () => {
       localStorage.setItem('roomPlanner_furnitureTemplates', 'invalid json');
       const loaded = loadFurnitureTemplates();
+      expect(loaded).toEqual([]);
+    });
+  });
+
+  describe('furniture instances', () => {
+    it('should save and load furniture instances', () => {
+      const furniture: FurnitureInstance[] = [
+        {
+          id: '1',
+          templateId: 'template-1',
+          position: { x: 5, y: 5 },
+          rotation: 0,
+        },
+        {
+          id: '2',
+          templateId: 'template-2',
+          position: { x: 10, y: 15 },
+          rotation: 90,
+        },
+      ];
+
+      saveFurniture(furniture);
+      const loaded = loadFurniture();
+
+      expect(loaded).toEqual(furniture);
+    });
+
+    it('should return empty array when no furniture saved', () => {
+      const loaded = loadFurniture();
+      expect(loaded).toEqual([]);
+    });
+
+    it('should handle invalid JSON gracefully', () => {
+      localStorage.setItem('roomPlanner_furniture', 'invalid json');
+      const loaded = loadFurniture();
       expect(loaded).toEqual([]);
     });
   });
@@ -114,14 +151,23 @@ describe('storage', () => {
         color: '#3498db',
       }];
 
+      const furniture: FurnitureInstance[] = [{
+        id: 'f1',
+        templateId: '1',
+        position: { x: 5, y: 5 },
+        rotation: 0,
+      }];
+
       saveLines(lines);
       saveFurnitureTemplates(templates);
+      saveFurniture(furniture);
 
       const exported = exportLayout();
       const parsed = JSON.parse(exported);
 
       expect(parsed.lines).toEqual(lines);
       expect(parsed.templates).toEqual(templates);
+      expect(parsed.furniture).toEqual(furniture);
       expect(parsed.version).toBe('1.0');
       expect(parsed.exportedAt).toBeDefined();
     });
@@ -145,6 +191,12 @@ describe('storage', () => {
           height: 1,
           color: '#e74c3c',
         }],
+        furniture: [{
+          id: 'f1',
+          templateId: '1',
+          position: { x: 3, y: 4 },
+          rotation: 90,
+        }],
         version: '1.0',
       };
 
@@ -153,9 +205,11 @@ describe('storage', () => {
 
       const loadedLines = loadLines();
       const loadedTemplates = loadFurnitureTemplates();
+      const loadedFurniture = loadFurniture();
 
       expect(loadedLines).toEqual(layoutData.lines);
       expect(loadedTemplates).toEqual(layoutData.templates);
+      expect(loadedFurniture).toEqual(layoutData.furniture);
     });
 
     it('should return false for invalid JSON', () => {

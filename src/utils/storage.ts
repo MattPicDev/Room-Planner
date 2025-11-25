@@ -1,4 +1,4 @@
-import type { FurnitureTemplate } from '../types/furniture';
+import type { FurnitureTemplate, FurnitureInstance } from '../types/furniture';
 import type { Line } from '../types/line';
 
 const STORAGE_KEYS = {
@@ -28,6 +28,30 @@ export function loadFurnitureTemplates(): FurnitureTemplate[] {
     return data ? JSON.parse(data) : [];
   } catch (error) {
     console.error('Failed to load furniture templates:', error);
+    return [];
+  }
+}
+
+/**
+ * Save furniture instances to local storage
+ */
+export function saveFurniture(furniture: FurnitureInstance[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.LAYOUT_FURNITURE, JSON.stringify(furniture));
+  } catch (error) {
+    console.error('Failed to save furniture:', error);
+  }
+}
+
+/**
+ * Load furniture instances from local storage
+ */
+export function loadFurniture(): FurnitureInstance[] {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.LAYOUT_FURNITURE);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Failed to load furniture:', error);
     return [];
   }
 }
@@ -86,7 +110,7 @@ export function loadGridScale(): number | null {
 export function exportLayout(): string {
   return JSON.stringify({
     lines: loadLines(),
-    furniture: localStorage.getItem(STORAGE_KEYS.LAYOUT_FURNITURE) || '[]',
+    furniture: loadFurniture(),
     templates: loadFurnitureTemplates(),
     gridScale: loadGridScale(),
     version: '1.0',
@@ -102,6 +126,9 @@ export function importLayout(jsonString: string): boolean {
     const data = JSON.parse(jsonString);
     if (data.lines) {
       saveLines(data.lines);
+    }
+    if (data.furniture) {
+      saveFurniture(data.furniture);
     }
     if (data.templates) {
       saveFurnitureTemplates(data.templates);
