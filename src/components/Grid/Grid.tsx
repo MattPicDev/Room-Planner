@@ -48,6 +48,11 @@ export function Grid({
   onZoomChange,
 }: GridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [canvasDimensions, setCanvasDimensions] = useState({ 
+    width: config.width, 
+    height: config.height 
+  });
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
   const [currentPoint, setCurrentPoint] = useState<{ x: number; y: number } | null>(null);
@@ -63,6 +68,29 @@ export function Grid({
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
   const [spacePressed, setSpacePressed] = useState(false);
+
+  // Minimum canvas dimensions (current default size)
+  const MIN_WIDTH = 800;
+  const MIN_HEIGHT = 600;
+
+  // Handle container resize
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        // Account for padding (20px on each side = 40px total)
+        const availableWidth = Math.max(MIN_WIDTH, Math.floor(width - 40));
+        const availableHeight = Math.max(MIN_HEIGHT, Math.floor(height - 40));
+        setCanvasDimensions({ width: availableWidth, height: availableHeight });
+      }
+    });
+
+    resizeObserver.observe(container);
+    return () => resizeObserver.disconnect();
+  }, []);
 
   // Calculate current line length and notify parent
   useEffect(() => {
@@ -121,7 +149,8 @@ export function Grid({
 
   // Draw the grid
   const drawGrid = useCallback((ctx: CanvasRenderingContext2D) => {
-    const { width, height, cellSize, gridColor, backgroundColor } = config;
+    const { cellSize, gridColor, backgroundColor } = config;
+    const { width, height } = canvasDimensions;
 
     // Clear canvas
     ctx.fillStyle = backgroundColor;
@@ -166,7 +195,7 @@ export function Grid({
     }
 
     ctx.restore();
-  }, [config, viewOffset, zoomLevel]);
+  }, [config, canvasDimensions, viewOffset, zoomLevel]);
 
   // Draw all lines
   const drawLines = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -697,11 +726,11 @@ export function Grid({
   };
 
   return (
-    <div className="grid-container">
+    <div ref={containerRef} className="grid-container">
       <canvas
         ref={canvasRef}
-        width={config.width}
-        height={config.height}
+        width={canvasDimensions.width}
+        height={canvasDimensions.height}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
