@@ -18,7 +18,7 @@ The project began with a `.plan` file that outlined the vision and feature requi
 
 ### Key Highlights
 
-- **Complete test coverage**: 200 passing tests including unit and component tests
+- **Complete test coverage**: 204 passing tests including unit and component tests
 - **CI/CD pipeline**: GitHub Actions workflow for automated testing on Node.js 18.x and 20.x
 - **Production-ready code**: Type-safe TypeScript, proper state management, and error handling
 - **User-focused design**: Interactive UI with real-time feedback and auto-save functionality
@@ -46,7 +46,7 @@ This project demonstrates AI's capability to:
 - **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
 - **Data Persistence**: Automatically saves layouts, lines, furniture instances, and scale to local storage
 - **Import/Export**: Save and load complete layouts including measurements, lines, and furniture as JSON files
-- **Testing**: Comprehensive test suite with 200 tests covering all features
+- **Testing**: Comprehensive test suite with 204 tests covering all features
 
 ### Planned Features
 - Visual snap indicators when near endpoints or grid
@@ -110,9 +110,12 @@ npm run preview
 - **Snap to Grid** checkbox:
   - **Checked**: Lines snap to grid and are constrained to horizontal/vertical directions
   - **Unchecked**: Free-form drawing allows any angle with smart snapping
+- **Prevent Overlapping** checkbox:
+  - **Checked** (default): Lines cannot overlap or intersect with existing lines
+  - **Unchecked**: Lines can be drawn freely without validation, allowing overlapping designs
 
 **View Options** (View section):
-- **Show Dimensions** checkbox:
+- **Show Dimensions** checkbox (enabled by default):
   - **Checked**: All lines display their length in inches as text labels on the canvas
   - Labels match line colors and are positioned above horizontal lines or to the right of vertical lines
   - Labels remain readable at all zoom levels

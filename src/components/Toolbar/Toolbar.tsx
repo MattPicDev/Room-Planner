@@ -18,6 +18,8 @@ interface ToolbarProps {
   onGridAlignedModeChange: (enabled: boolean) => void;
   showLineDimensions: boolean;
   onShowLineDimensionsChange: (show: boolean) => void;
+  preventOverlapping: boolean;
+  onPreventOverlappingChange: (prevent: boolean) => void;
 }
 
 export function Toolbar({
@@ -36,6 +38,8 @@ export function Toolbar({
   onGridAlignedModeChange,
   showLineDimensions,
   onShowLineDimensionsChange,
+  preventOverlapping,
+  onPreventOverlappingChange,
 }: ToolbarProps) {
   const [lengthInput, setLengthInput] = useState('');
   const [isEditingLength, setIsEditingLength] = useState(false);
@@ -149,6 +153,17 @@ export function Toolbar({
               style={{ marginRight: '6px' }}
             />
             Snap to Grid
+          </label>
+        </div>
+        <div style={{ marginTop: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={preventOverlapping}
+              onChange={(e) => onPreventOverlappingChange(e.target.checked)}
+              style={{ marginRight: '6px' }}
+            />
+            Prevent Overlapping
           </label>
         </div>
       </div>

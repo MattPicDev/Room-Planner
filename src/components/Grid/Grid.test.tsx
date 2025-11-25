@@ -16,6 +16,7 @@ const mockConfig: GridConfig = {
   snapToGrid: true,
   snapDistance: 2.5,
   showLineDimensions: false,
+  preventOverlapping: true,
 };
 
 const mockTemplates: FurnitureTemplate[] = [

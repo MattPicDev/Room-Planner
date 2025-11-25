@@ -15,6 +15,7 @@ export interface GridConfig {
   snapToGrid: boolean; // Whether to snap to grid lines/intersections in free-form mode
   snapDistance: number; // Snap distance in pixels
   showLineDimensions: boolean; // Whether to display line lengths as text labels
+  preventOverlapping: boolean; // Whether to prevent overlapping lines
 }
 
 export const DEFAULT_GRID_CONFIG: GridConfig = {
@@ -28,5 +29,6 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   snapToEndpoints: true, // Enable endpoint snapping by default
   snapToGrid: true, // Enable grid snapping by default
   snapDistance: 2.5, // Default: 1/8 of a 20px cell = 2.5px
-  showLineDimensions: false, // Don't show dimensions by default
+  showLineDimensions: true, // Show dimensions by default
+  preventOverlapping: true, // Prevent overlapping lines by default
 };

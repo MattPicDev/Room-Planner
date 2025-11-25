@@ -121,6 +121,10 @@ function App() {
     setGridConfig({ ...gridConfig, showLineDimensions: show });
   };
 
+  const handlePreventOverlappingChange = (prevent: boolean) => {
+    setGridConfig({ ...gridConfig, preventOverlapping: prevent });
+  };
+
   const handleClear = () => {
     if (confirm('Reset will clear all lines and furniture, and allow you to set a new grid scale. Continue?')) {
       setLines([]);
@@ -251,6 +255,8 @@ function App() {
         onGridAlignedModeChange={handleGridAlignedModeChange}
         showLineDimensions={gridConfig.showLineDimensions}
         onShowLineDimensionsChange={handleShowLineDimensionsChange}
+        preventOverlapping={gridConfig.preventOverlapping}
+        onPreventOverlappingChange={handlePreventOverlappingChange}
       />
 
       <main className="app-main">

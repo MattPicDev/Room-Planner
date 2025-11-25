@@ -34,4 +34,5 @@ Visual room layout application built with TypeScript, React, and Vite for intera
 - [x] Interactive line length editing in toolbar
 - [x] Furniture instance persistence (save/load/export/import)
 - [x] TypeScript type compliance in tests
-- [x] Line dimension labels (optional display toggle)
+- [x] Line dimension labels (optional display toggle, enabled by default)
+- [x] Configurable line overlap prevention (enabled by default)

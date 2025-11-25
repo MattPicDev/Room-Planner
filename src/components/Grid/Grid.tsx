@@ -695,6 +695,21 @@ export function Grid({
         start: { ...startPoint },
         end: { ...currentPoint },
       };
+      
+      // Check for overlaps if validation enabled
+      if (config.preventOverlapping) {
+        const updatedLine: Line = { ...selectedLine, ...updates };
+        const otherLines = lines.filter(l => l.id !== selectedLine.id);
+        if (checkLineIntersection(updatedLine, otherLines)) {
+          console.warn('Cannot move line: would intersect with existing line');
+          setIsDraggingLine(false);
+          setLineDragOffset(null);
+          setStartPoint(null);
+          setCurrentPoint(null);
+          return;
+        }
+      }
+      
       onLineEdit(selectedLine.id, updates);
       setIsDraggingLine(false);
       setLineDragOffset(null);
@@ -711,6 +726,19 @@ export function Grid({
         const updates: Partial<Line> = isDraggingEndpoint === 'start'
           ? { start: { ...currentPoint }, end: { ...startPoint } }
           : { start: { ...startPoint }, end: { ...currentPoint } };
+        
+        // Check for overlaps if validation enabled
+        if (config.preventOverlapping) {
+          const updatedLine: Line = { ...selectedLine, ...updates };
+          const otherLines = lines.filter(l => l.id !== selectedLine.id);
+          if (checkLineIntersection(updatedLine, otherLines)) {
+            console.warn('Cannot resize line: would intersect with existing line');
+            setIsDraggingEndpoint(null);
+            setStartPoint(null);
+            setCurrentPoint(null);
+            return;
+          }
+        }
         
         onLineEdit(selectedLine.id, updates);
       } else {
@@ -737,8 +765,8 @@ export function Grid({
           color: lineDefaults.color,
         };
         
-        // Check if the new line intersects with any existing lines
-        if (checkLineIntersection(newLine, lines)) {
+        // Check if the new line intersects with any existing lines (if validation enabled)
+        if (config.preventOverlapping && checkLineIntersection(newLine, lines)) {
           // Don't add the line if it intersects
           console.warn('Cannot add line: intersects with existing line');
         } else {

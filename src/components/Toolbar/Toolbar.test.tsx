@@ -17,6 +17,8 @@ describe('Toolbar', () => {
     onGridAlignedModeChange: vi.fn(),
     showLineDimensions: false,
     onShowLineDimensionsChange: vi.fn(),
+    preventOverlapping: true,
+    onPreventOverlappingChange: vi.fn(),
   };
 
   it('renders all action buttons', () => {
@@ -313,6 +315,48 @@ describe('Toolbar', () => {
       fireEvent.click(checkbox);
       
       expect(onShowLineDimensionsChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('Prevent Overlapping checkbox', () => {
+    it('renders prevent overlapping checkbox', () => {
+      render(<Toolbar {...defaultProps} />);
+      
+      expect(screen.getByText('Prevent Overlapping')).toBeInTheDocument();
+      const checkbox = screen.getByRole('checkbox', { name: /prevent overlapping/i });
+      expect(checkbox).toBeInTheDocument();
+    });
+
+    it('reflects preventOverlapping state in checkbox', () => {
+      const { rerender } = render(<Toolbar {...defaultProps} preventOverlapping={true} />);
+      
+      let checkbox = screen.getByRole('checkbox', { name: /prevent overlapping/i });
+      expect(checkbox).toBeChecked();
+      
+      rerender(<Toolbar {...defaultProps} preventOverlapping={false} />);
+      
+      checkbox = screen.getByRole('checkbox', { name: /prevent overlapping/i });
+      expect(checkbox).not.toBeChecked();
+    });
+
+    it('calls onPreventOverlappingChange when checkbox is toggled', () => {
+      const onPreventOverlappingChange = vi.fn();
+      render(<Toolbar {...defaultProps} preventOverlapping={true} onPreventOverlappingChange={onPreventOverlappingChange} />);
+      
+      const checkbox = screen.getByRole('checkbox', { name: /prevent overlapping/i });
+      fireEvent.click(checkbox);
+      
+      expect(onPreventOverlappingChange).toHaveBeenCalledWith(false);
+    });
+
+    it('calls onPreventOverlappingChange with true when checked', () => {
+      const onPreventOverlappingChange = vi.fn();
+      render(<Toolbar {...defaultProps} preventOverlapping={false} onPreventOverlappingChange={onPreventOverlappingChange} />);
+      
+      const checkbox = screen.getByRole('checkbox', { name: /prevent overlapping/i });
+      fireEvent.click(checkbox);
+      
+      expect(onPreventOverlappingChange).toHaveBeenCalledWith(true);
     });
   });
 });
