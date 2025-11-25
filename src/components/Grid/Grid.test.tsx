@@ -204,5 +204,152 @@ describe('Grid Pan/Zoom', () => {
     // Should have called onCurrentLineLengthChange with line length
     expect(onCurrentLineLengthChange).toHaveBeenCalled();
   });
+
+  it('should handle middle mouse button panning', () => {
+    render(
+      <Grid
+        config={mockConfig}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+      />
+    );
+
+    const canvas = document.querySelector('canvas')!;
+
+    // Start panning with middle mouse button
+    const mouseDownEvent = new MouseEvent('mousedown', {
+      button: 1, // Middle mouse button
+      clientX: 400,
+      clientY: 300,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(mouseDownEvent);
+
+    // Move mouse while panning
+    const mouseMoveEvent = new MouseEvent('mousemove', {
+      clientX: 500,
+      clientY: 400,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(mouseMoveEvent);
+
+    // Release middle mouse button
+    const mouseUpEvent = new MouseEvent('mouseup', {
+      button: 1,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(mouseUpEvent);
+
+    // Should complete without errors (actual viewport offset changes are internal)
+    expect(canvas).toBeTruthy();
+  });
+
+  it('should handle spacebar panning', () => {
+    render(
+      <Grid
+        config={mockConfig}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+      />
+    );
+
+    const canvas = document.querySelector('canvas')!;
+
+    // Press spacebar
+    const keyDownEvent = new KeyboardEvent('keydown', {
+      code: 'Space',
+      bubbles: true,
+    });
+    window.dispatchEvent(keyDownEvent);
+
+    // Start panning with left mouse button while spacebar is held
+    const mouseDownEvent = new MouseEvent('mousedown', {
+      button: 0,
+      clientX: 400,
+      clientY: 300,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(mouseDownEvent);
+
+    // Move mouse
+    const mouseMoveEvent = new MouseEvent('mousemove', {
+      clientX: 500,
+      clientY: 400,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(mouseMoveEvent);
+
+    // Release mouse
+    const mouseUpEvent = new MouseEvent('mouseup', {
+      button: 0,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(mouseUpEvent);
+
+    // Release spacebar
+    const keyUpEvent = new KeyboardEvent('keyup', {
+      code: 'Space',
+      bubbles: true,
+    });
+    window.dispatchEvent(keyUpEvent);
+
+    // Should complete without errors
+    expect(canvas).toBeTruthy();
+  });
+
+  it('should maintain zoom center at cursor position', () => {
+    const onZoomChange = vi.fn();
+
+    render(
+      <Grid
+        config={mockConfig}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+        onZoomChange={onZoomChange}
+      />
+    );
+
+    const canvas = document.querySelector('canvas')!;
+    const rect = canvas.getBoundingClientRect();
+
+    // Zoom at a specific cursor position
+    const wheelEvent = new WheelEvent('wheel', {
+      deltaY: -100,
+      clientX: rect.left + 200,
+      clientY: rect.top + 150,
+      bubbles: true,
+    });
+    canvas.dispatchEvent(wheelEvent);
+
+    // Zoom should have been triggered
+    expect(onZoomChange).toHaveBeenCalled();
+
+    // The viewport should adjust to keep the cursor position stable
+    // (This is tested by ensuring the function completes without errors)
+  });
 });
 

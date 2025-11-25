@@ -8,13 +8,14 @@ A visual room layout application built with React, TypeScript, and Vite. Design 
 - **Grid-based Canvas**: Graph paper style layout with configurable grid size
 - **Measurement System**: Set scale (inches per grid square) for real-world accuracy
 - **Line Drawing**: Draw walls, doors, and windows along grid lines with live length display
-- **Line Editing**: Select lines, drag endpoints to resize/move, and delete lines
+- **Line Editing**: Select lines, drag endpoints to resize, translate entire lines, and delete lines
+- **Pan & Zoom**: Smooth viewport navigation with mouse wheel zoom and spacebar/middle-click panning
 - **Furniture Management**: Create custom furniture templates with dimensions in inches
 - **Furniture Editing**: Move and rotate furniture with drag-and-drop
 - **Interactive Tools**: Draw mode, furniture mode, and select mode with visual feedback
 - **Data Persistence**: Automatically saves layouts, furniture, and scale to local storage
 - **Import/Export**: Save and load complete layouts including measurements as JSON files
-- **Testing**: Comprehensive test suite with 69+ unit tests
+- **Testing**: Comprehensive test suite with 77+ unit tests covering all features
 
 ### Planned Features
 - Diagonal and curved line drawing
@@ -56,11 +57,12 @@ npm run preview
 - Use **Reset** to clear the layout and set a new scale
 
 ### Pan and Zoom
-- **Zoom**: Use mouse wheel to zoom in and out
+- **Zoom**: Use mouse wheel to zoom in and out (range: 10% to 500%)
 - **Pan**: Hold **Spacebar** or **Middle Mouse Button** and drag to pan around the canvas
 - The zoom level is displayed in the toolbar (e.g., "Zoom: 100%")
-- Zoom maintains the position under your cursor for easy navigation
-- All elements (grid, lines, furniture) scale together for accurate visualization
+- Zoom maintains the position under your cursor for easy navigation and precise work
+- All elements (grid, lines, furniture) scale together maintaining accurate proportions
+- Zoom is especially useful for detailed work or viewing large room layouts
 
 ### Drawing Lines
 1. Select **Draw Line** tool from the toolbar
@@ -72,9 +74,11 @@ npm run preview
 ### Editing Lines
 1. Select **Select** tool from the toolbar
 2. Click on any line to select it (highlighted in blue)
-3. Drag the endpoints (blue circles) to resize or move the line
-4. Click **Delete Line** button to remove the selected line
-5. Click elsewhere to deselect
+3. **Resize**: Drag the endpoints (blue circles) to change the line length
+4. **Move**: Drag the line body (not the endpoints) to translate the entire line without changing its length
+5. **Length Display**: When a line is selected, its length appears in the "Selected" section of the toolbar
+6. Click **Delete Line** button to remove the selected line
+7. Click elsewhere to deselect
 
 ### Managing Furniture
 1. Click **Furniture** tool to open the furniture library
