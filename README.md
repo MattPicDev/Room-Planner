@@ -70,11 +70,11 @@ npm run preview
 ### Drawing Lines
 1. Select **Draw Line** tool from the toolbar
 2. Choose line type: **Wall**, **Door**, or **Window**
-3. **Toggle Drawing Mode**:
-   - **Grid Aligned** (checked): Lines snap to grid and are constrained to horizontal/vertical directions
-   - **Grid Aligned** (unchecked): Free-form drawing allows any angle with smart snapping
+3. **Snap to Grid** checkbox (in Tools section, always visible):
+   - **Checked**: Lines snap to grid and are constrained to horizontal/vertical directions
+   - **Unchecked**: Free-form drawing allows any angle with smart snapping
 4. Click and drag on the canvas to draw lines
-5. **Smart Snapping** (when not grid-aligned):
+5. **Smart Snapping** (when snap to grid is unchecked):
    - Lines snap to endpoints of existing lines (within 2.5 pixels) - useful for creating connected layouts
    - Lines snap to grid lines/intersections (within 2.5 pixels) - helpful for alignment
    - Endpoint snapping takes priority over grid snapping
@@ -84,7 +84,9 @@ npm run preview
 1. Select **Select** tool from the toolbar
 2. Click on any line to select it (highlighted in blue)
 3. **Resize**: Drag the endpoints (blue circles) to change the line length
+   - **Snap to Grid** checkbox affects endpoint dragging behavior
 4. **Move**: Drag the line body (not the endpoints) to translate the entire line without changing its length
+   - **Snap to Grid** checkbox affects line movement
 5. **Edit Length**: 
    - Click on the length display in the toolbar "Selected" section
    - Type the desired length in inches and press Enter
@@ -101,8 +103,10 @@ npm run preview
    - Choose a color
    - Optionally add a category
 3. Click on a template to select it for placement
-4. Click on the grid to place furniture (automatically scales to grid)
+4. Click on the grid to place furniture
+   - **Snap to Grid** checkbox controls placement: checked = grid-aligned, unchecked = free placement
 5. Use **Select** tool to move furniture by dragging
+   - **Snap to Grid** checkbox affects furniture movement
 6. With furniture selected, use **Rotate 90°** to rotate
 7. Click **Delete** to remove furniture from the room
 

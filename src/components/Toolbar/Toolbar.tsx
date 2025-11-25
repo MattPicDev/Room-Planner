@@ -105,6 +105,17 @@ export function Toolbar({
         >
           Select
         </button>
+        <div style={{ marginTop: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={gridAlignedMode}
+              onChange={(e) => onGridAlignedModeChange(e.target.checked)}
+              style={{ marginRight: '6px' }}
+            />
+            Snap to Grid
+          </label>
+        </div>
       </div>
 
       {selectedTool === 'line' && (
@@ -128,17 +139,6 @@ export function Toolbar({
           >
             Window
           </button>
-          <div style={{ marginTop: '8px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={gridAlignedMode}
-                onChange={(e) => onGridAlignedModeChange(e.target.checked)}
-                style={{ marginRight: '6px' }}
-              />
-              Grid Aligned
-            </label>
-          </div>
         </div>
       )}
 
