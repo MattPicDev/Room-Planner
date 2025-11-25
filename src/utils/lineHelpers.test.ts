@@ -163,7 +163,7 @@ describe('lineHelpers', () => {
       expect(doLinesIntersect(line1, line2)).toBe(false);
     });
 
-    it('detects intersection at line endpoints', () => {
+    it('allows lines sharing a single endpoint (common for connecting walls)', () => {
       const line1: Line = {
         id: '1',
         start: { x: 0, y: 0 },
@@ -180,7 +180,67 @@ describe('lineHelpers', () => {
         thickness: 4,
         color: '#000000',
       };
+      expect(doLinesIntersect(line1, line2)).toBe(false);
+    });
+
+    it('detects identical lines (both endpoints match)', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
       expect(doLinesIntersect(line1, line2)).toBe(true);
+    });
+
+    it('detects identical lines in reverse direction', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 10, y: 0 },
+        end: { x: 0, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(true);
+    });
+
+    it('allows L-shaped walls (end-to-start connection)', () => {
+      const line1: Line = {
+        id: '1',
+        start: { x: 0, y: 0 },
+        end: { x: 10, y: 0 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      const line2: Line = {
+        id: '2',
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 10 },
+        type: 'wall',
+        thickness: 4,
+        color: '#000000',
+      };
+      expect(doLinesIntersect(line1, line2)).toBe(false);
     });
 
     it('handles parallel non-overlapping lines', () => {

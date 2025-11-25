@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import type { GridConfig } from '../../types/grid';
-import type { Line } from '../../types/line';
+import type { Line, LineType } from '../../types/line';
+import { LINE_DEFAULTS } from '../../types/line';
 import type { FurnitureInstance, FurnitureTemplate } from '../../types/furniture';
 import { snapToGrid, canvasToGrid, calculateLineLength, smartSnap } from '../../utils/gridHelpers';
 import { findLineAtPoint, findEndpointAtPoint, checkLineIntersection } from '../../utils/lineHelpers';
@@ -14,6 +15,7 @@ interface GridProps {
   furnitureTemplates: FurnitureTemplate[];
   mode: 'draw' | 'select' | 'furniture';
   selectedTemplate?: FurnitureTemplate | null;
+  selectedLineType?: LineType;
   onLineAdd?: (line: Line) => void;
   onLineEdit?: (lineId: string, updates: Partial<Line>) => void;
   onLineSelect?: (line: Line | null) => void;
@@ -33,6 +35,7 @@ export function Grid({
   furnitureTemplates,
   mode, 
   selectedTemplate,
+  selectedLineType = 'wall',
   onLineAdd, 
   onLineEdit, 
   onLineSelect, 
@@ -630,13 +633,14 @@ export function Grid({
     if (isDrawing && startPoint && currentPoint && onLineAdd && mode === 'draw') {
       // Only add line if it has length
       if (startPoint.x !== currentPoint.x || startPoint.y !== currentPoint.y) {
+        const lineDefaults = LINE_DEFAULTS[selectedLineType];
         const newLine: Line = {
           id: crypto.randomUUID(),
           start: startPoint,
           end: currentPoint,
-          type: 'wall',
-          thickness: 4,
-          color: '#000000',
+          type: selectedLineType,
+          thickness: lineDefaults.thickness,
+          color: lineDefaults.color,
         };
         
         // Check if the new line intersects with any existing lines

@@ -76,12 +76,41 @@ export function findEndpointAtPoint(
 }
 
 /**
+ * Check if two points are equal (within floating point tolerance)
+ */
+function pointsEqual(p1: Point, p2: Point): boolean {
+  return Math.abs(p1.x - p2.x) < 1e-10 && Math.abs(p1.y - p2.y) < 1e-10;
+}
+
+/**
  * Check if two line segments intersect
  * Based on: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+ * Returns true only if lines intersect between endpoints or are identical
+ * Allows lines to share a single endpoint (common for connecting walls)
  */
 export function doLinesIntersect(line1: Line, line2: Line): boolean {
   const { start: p1, end: p2 } = line1;
   const { start: p3, end: p4 } = line2;
+
+  // Check if lines are identical (both endpoints match)
+  const identicalForward = pointsEqual(p1, p3) && pointsEqual(p2, p4);
+  const identicalReverse = pointsEqual(p1, p4) && pointsEqual(p2, p3);
+  if (identicalForward || identicalReverse) {
+    return true; // Identical lines are invalid
+  }
+
+  // Check if lines share exactly one endpoint
+  const sharedEndpointCount = [
+    pointsEqual(p1, p3),
+    pointsEqual(p1, p4),
+    pointsEqual(p2, p3),
+    pointsEqual(p2, p4),
+  ].filter(Boolean).length;
+
+  // Allow lines that share exactly one endpoint (common for connecting walls)
+  if (sharedEndpointCount === 1) {
+    return false;
+  }
 
   // Calculate direction vectors
   const d1x = p2.x - p1.x;
@@ -102,9 +131,9 @@ export function doLinesIntersect(line1: Line, line2: Line): boolean {
   const t = ((p3.x - p1.x) * d2y - (p3.y - p1.y) * d2x) / denominator;
   const u = ((p3.x - p1.x) * d1y - (p3.y - p1.y) * d1x) / denominator;
 
-  // Lines intersect if both parameters are between 0 and 1
-  // Allow sharing endpoints (t or u can be exactly 0 or 1)
-  return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+  // Lines intersect in their interior if both parameters are strictly between 0 and 1
+  // Endpoint cases are already handled above
+  return t > 0 && t < 1 && u > 0 && u < 1;
 }
 
 /**

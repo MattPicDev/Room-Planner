@@ -71,15 +71,8 @@ function App() {
   }, [furniture]);
 
   const handleLineAdd = (line: Line) => {
-    // Apply current line type settings
-    const lineDefaults = LINE_DEFAULTS[selectedLineType];
-    const newLine: Line = {
-      ...line,
-      type: selectedLineType,
-      thickness: lineDefaults.thickness,
-      color: lineDefaults.color,
-    };
-    setLines([...lines, newLine]);
+    // Line already has correct type and styling from Grid component
+    setLines([...lines, line]);
   };
 
   const handleLineEdit = (lineId: string, updates: Partial<Line>) => {
@@ -313,6 +306,7 @@ function App() {
               furnitureTemplates={furnitureTemplates}
               mode={selectedTool === 'line' ? 'draw' : selectedTool === 'furniture' ? 'furniture' : 'select'}
               selectedTemplate={selectedTemplate}
+              selectedLineType={selectedLineType}
               onLineAdd={handleLineAdd}
               onLineEdit={handleLineEdit}
               onLineSelect={setSelectedLine}
