@@ -418,7 +418,7 @@ export function Grid({
         });
       } else if (selectedTemplate) {
         // Place new furniture (respect snap to grid setting)
-        const position = config.gridAlignedMode ? gridPos : canvasToGrid(worldPoint, config.cellSize);
+        const position = config.gridAlignedMode ? gridPos : worldPoint;
         const newFurniture: FurnitureInstance = {
           id: crypto.randomUUID(),
           templateId: selectedTemplate.id,
@@ -523,7 +523,7 @@ export function Grid({
 
     // Handle dragging furniture (respect snap to grid setting)
     if (isDraggingFurniture && selectedFurniture && dragOffset && onFurnitureMove) {
-      const basePos = config.gridAlignedMode ? gridPos : canvasToGrid(worldPoint, config.cellSize);
+      const basePos = config.gridAlignedMode ? gridPos : worldPoint;
       const newPos = {
         x: basePos.x - dragOffset.x,
         y: basePos.y - dragOffset.y,
