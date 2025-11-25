@@ -122,10 +122,11 @@ describe('Grid Furniture Snap Behavior', () => {
       // Should have added furniture
       expect(onFurnitureAdd).toHaveBeenCalled();
       
-      // Position should use raw world coordinates (not grid-aligned)
+      // Position should use fractional grid coordinates (worldPoint / cellSize) when snap is disabled
+      // Click at (103, 97) with cellSize=20 gives grid coords (5.15, 4.85)
       const addedFurniture = onFurnitureAdd.mock.calls[0][0] as FurnitureInstance;
-      expect(addedFurniture.position.x).toBe(103);
-      expect(addedFurniture.position.y).toBe(97);
+      expect(addedFurniture.position.x).toBe(103 / 20);
+      expect(addedFurniture.position.y).toBe(97 / 20);
       expect(addedFurniture.templateId).toBe(mockTemplate.id);
     });
 
