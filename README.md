@@ -2,6 +2,34 @@
 
 A visual room layout application built with React, TypeScript, and Vite. Design room layouts on an interactive grid-based canvas with walls, doors, and windows.
 
+## AI-Generated Project
+
+This project was developed through a collaborative human-AI partnership using **Claude Sonnet 4.5** as the development assistant. The development process showcases how AI can effectively build complete, production-ready applications with proper testing and documentation.
+
+### Development Approach
+
+The project began with a `.plan` file that outlined the vision and feature requirements. Through iterative development:
+
+1. **Planning**: The human developer (MattPicDev) provided the initial concept and high-level requirements in `.plan`
+2. **Implementation**: Claude Sonnet 4.5 implemented features, following best practices for React/TypeScript development
+3. **Testing**: Each feature includes comprehensive unit tests (193 tests covering utilities and components)
+4. **Documentation**: All features are documented in code, README, and commit messages
+5. **Iteration**: Bugs and feature requests were addressed through conversational debugging and enhancement
+
+### Key Highlights
+
+- **Complete test coverage**: 193 passing tests including unit and component tests
+- **CI/CD pipeline**: GitHub Actions workflow for automated testing on Node.js 18.x and 20.x
+- **Production-ready code**: Type-safe TypeScript, proper state management, and error handling
+- **User-focused design**: Interactive UI with real-time feedback and auto-save functionality
+
+This project demonstrates AI's capability to:
+- Understand complex requirements and translate them into working code
+- Write comprehensive tests alongside implementation
+- Debug issues through conversation and code analysis
+- Maintain consistent code quality and documentation standards
+- Handle edge cases and user experience considerations
+
 ## Features
 
 ### Current (v1.1)
