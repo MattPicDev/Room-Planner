@@ -90,9 +90,10 @@ npm run preview
 
 ### Pan and Zoom
 - **Zoom**: Use mouse wheel to zoom in and out (range: 10% to 500%)
+  - Scrolling over the canvas zooms without scrolling the webpage
+  - Zoom maintains the position under your cursor for easy navigation and precise work
 - **Pan**: Hold **Spacebar** or **Middle Mouse Button** and drag to pan around the canvas
 - The zoom level is displayed in the toolbar (e.g., "Zoom: 100%")
-- Zoom maintains the position under your cursor for easy navigation and precise work
 - All elements (grid, lines, furniture) scale together maintaining accurate proportions
 - Zoom is especially useful for detailed work or viewing large room layouts
 

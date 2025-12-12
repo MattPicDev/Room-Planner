@@ -147,6 +147,51 @@ export function Grid({
     };
   }, []);
 
+  // Prevent page scroll on wheel event over canvas while handling zoom
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // Calculate world position before zoom
+      const worldBefore = {
+        x: (mouseX - viewOffset.x) / zoomLevel,
+        y: (mouseY - viewOffset.y) / zoomLevel,
+      };
+
+      // Update zoom level
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      const newZoom = Math.max(0.1, Math.min(5, zoomLevel * zoomFactor));
+      setZoomLevel(newZoom);
+
+      // Calculate world position after zoom (to maintain mouse position)
+      const worldAfter = {
+        x: (mouseX - viewOffset.x) / newZoom,
+        y: (mouseY - viewOffset.y) / newZoom,
+      };
+
+      // Adjust offset to keep mouse position stable
+      setViewOffset({
+        x: viewOffset.x + (worldAfter.x - worldBefore.x) * newZoom,
+        y: viewOffset.y + (worldAfter.y - worldBefore.y) * newZoom,
+      });
+    };
+
+    // Add event listener with passive: false to allow preventDefault
+    canvas.addEventListener('wheel', handleNativeWheel, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('wheel', handleNativeWheel);
+    };
+  }, [viewOffset, zoomLevel]);
+
   // Draw the grid
   const drawGrid = useCallback((ctx: CanvasRenderingContext2D) => {
     const { cellSize, gridColor, backgroundColor } = config;
@@ -780,37 +825,6 @@ export function Grid({
     setCurrentPoint(null);
   };
 
-  // Handle mouse wheel for zooming
-  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    // Calculate world position before zoom
-    const worldBefore = screenToWorld(mouseX, mouseY);
-
-    // Update zoom level
-    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.max(0.1, Math.min(5, zoomLevel * zoomFactor));
-    setZoomLevel(newZoom);
-
-    // Calculate world position after zoom (to maintain mouse position)
-    const worldAfter = {
-      x: (mouseX - viewOffset.x) / newZoom,
-      y: (mouseY - viewOffset.y) / newZoom,
-    };
-
-    // Adjust offset to keep mouse position stable
-    setViewOffset({
-      x: viewOffset.x + (worldAfter.x - worldBefore.x) * newZoom,
-      y: viewOffset.y + (worldAfter.y - worldBefore.y) * newZoom,
-    });
-  };
-
   return (
     <div ref={containerRef} className="grid-container">
       <canvas
@@ -821,7 +835,6 @@ export function Grid({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
         className="grid-canvas"
       />
     </div>

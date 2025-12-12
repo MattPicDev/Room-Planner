@@ -126,6 +126,50 @@ describe('Grid Pan/Zoom', () => {
     expect(maxZoom).toBeLessThanOrEqual(5);
   });
 
+  it('should prevent page scroll when wheeling over canvas', () => {
+    const onZoomChange = vi.fn();
+
+    render(
+      <Grid
+        config={mockConfig}
+        lines={[]}
+        furniture={[]}
+        furnitureTemplates={mockTemplates}
+        mode="select"
+        onLineAdd={vi.fn()}
+        onLineEdit={vi.fn()}
+        onLineSelect={vi.fn()}
+        onFurnitureAdd={vi.fn()}
+        onFurnitureSelect={vi.fn()}
+        onFurnitureMove={vi.fn()}
+        onZoomChange={onZoomChange}
+      />
+    );
+
+    const canvas = document.querySelector('canvas')!;
+
+    // Create a wheel event with preventDefault tracking
+    const wheelEvent = new WheelEvent('wheel', {
+      deltaY: -100,
+      clientX: 400,
+      clientY: 300,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    const preventDefaultSpy = vi.spyOn(wheelEvent, 'preventDefault');
+    const stopPropagationSpy = vi.spyOn(wheelEvent, 'stopPropagation');
+
+    canvas.dispatchEvent(wheelEvent);
+
+    // Should prevent default to stop page scroll
+    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(stopPropagationSpy).toHaveBeenCalled();
+    
+    // Should still handle zoom
+    expect(onZoomChange).toHaveBeenCalled();
+  });
+
   it('should render with lines and furniture without errors', () => {
     // This test verifies that viewport transforms don't break rendering
     render(

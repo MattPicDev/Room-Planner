@@ -36,3 +36,4 @@ Visual room layout application built with TypeScript, React, and Vite for intera
 - [x] TypeScript type compliance in tests
 - [x] Line dimension labels (optional display toggle, enabled by default)
 - [x] Configurable line overlap prevention (enabled by default)
+- [x] Canvas zoom without page scroll (native wheel event handling)
