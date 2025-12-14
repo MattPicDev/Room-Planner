@@ -312,16 +312,34 @@ export function Grid({
 
       // Draw dimension label if enabled
       if (config.showLineDimensions) {
+        // Determine the actual start and end positions (preview if dragging, otherwise original)
+        let labelStart, labelEnd;
+        if (isDraggingThisLine) {
+          if (isDraggingLine) {
+            labelStart = startPoint;
+            labelEnd = currentPoint;
+          } else if (isDraggingEndpoint === 'start') {
+            labelStart = currentPoint;
+            labelEnd = startPoint;
+          } else {
+            labelStart = startPoint;
+            labelEnd = currentPoint;
+          }
+        } else {
+          labelStart = line.start;
+          labelEnd = line.end;
+        }
+
         // Calculate line length in inches
-        const dx = line.end.x - line.start.x;
-        const dy = line.end.y - line.start.y;
+        const dx = labelEnd.x - labelStart.x;
+        const dy = labelEnd.y - labelStart.y;
         const lengthInPixels = Math.sqrt(dx * dx + dy * dy);
         const pixelsPerInch = config.cellSize / config.inchesPerCell;
         const lengthInInches = Math.round(lengthInPixels / pixelsPerInch);
 
         // Calculate midpoint
-        const midX = (line.start.x + line.end.x) / 2;
-        const midY = (line.start.y + line.end.y) / 2;
+        const midX = (labelStart.x + labelEnd.x) / 2;
+        const midY = (labelStart.y + labelEnd.y) / 2;
 
         // Determine label offset based on line orientation
         const angle = Math.atan2(dy, dx);

@@ -39,6 +39,7 @@ This project demonstrates AI's capability to:
 - **Smart Snapping System**: Lines intelligently snap to endpoints of existing lines or grid lines/intersections
 - **Line Drawing**: Draw walls, doors, and windows with live length display
 - **Line Dimension Labels**: Optional display of length measurements on all lines (toggle with checkbox)
+  - Dimension labels update in real-time while dragging or resizing lines
 - **Line Editing**: Select lines, drag endpoints to resize, translate entire lines, edit length by typing, and delete lines
 - **Pan & Zoom**: Smooth viewport navigation with mouse wheel zoom and spacebar/middle-click panning
 - **Furniture Management**: Create custom furniture templates with dimensions in inches
